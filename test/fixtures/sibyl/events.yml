@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  type: 
+  occurred_at: 2015-12-17 14:20:59
+  data: 
+  created_at: 2015-12-17 14:20:59
+
+two:
+  type: 
+  occurred_at: 2015-12-17 14:20:59
+  data: 
+  created_at: 2015-12-17 14:20:59
