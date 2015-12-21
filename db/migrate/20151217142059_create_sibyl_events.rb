@@ -1,7 +1,7 @@
 class CreateSibylEvents < ActiveRecord::Migration
   def change
     create_table :sibyl_events do |t|
-      t.string :type, null: false, index: true
+      t.string :kind, null: false, index: true
       t.datetime :occurred_at, null: false, index: true
       t.jsonb :data, null: false, default: '{}'
       t.datetime :created_at, null: false

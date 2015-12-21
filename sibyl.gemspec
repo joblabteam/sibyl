@@ -9,15 +9,16 @@ Gem::Specification.new do |s|
   s.version     = Sibyl::VERSION
   s.authors     = ["Simon George"]
   s.email       = ["simon@sfcgeorge.co.uk"]
-  s.homepage    = "TODO"
-  s.summary     = "TODO: Summary of Sibyl."
-  s.description = "TODO: Description of Sibyl."
+  s.homepage    = ""
+  s.summary     = "Sibyl is a central event log, trigger, and analysis tool."
+  s.description = "Sibyl is a central event log, trigger, and analysis tool."
   s.license     = "MIT"
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
   s.test_files = Dir["test/**/*"]
 
   s.add_dependency "rails", "~> 4.2.0"
+  # s.add_dependency "pg"
 
-  s.add_development_dependency "sqlite3"
+  # s.add_development_dependency "pg"
 end

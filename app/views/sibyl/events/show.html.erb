@@ -1,8 +1,8 @@
 <p id="notice"><%= notice %></p>
 
 <p>
-  <strong>Type:</strong>
-  <%= @event.type %>
+  <strong>Kind:</strong>
+  <%= @event.kind %>
 </p>
 
 <p>
@@ -12,7 +12,7 @@
 
 <p>
   <strong>Data:</strong>
-  <%= @event.data %>
+  <%= nested_hash_to_list @event.data %>
 </p>
 
 <p>
@@ -20,5 +20,4 @@
   <%= @event.created_at %>
 </p>
 
-<%= link_to 'Edit', edit_event_path(@event) %> |
 <%= link_to 'Back', events_path %>
