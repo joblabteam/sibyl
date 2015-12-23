@@ -7,8 +7,8 @@ module Sibyl
         data: data
       )
 
-      if (actions = TRIGGERS[kind.to_sym])
-        actions.each { |action| action.(self, kind, event) }
+      if (actions = TRIGGERS[kind])
+        actions.each { |action| action.new(self).call(kind, event) }
       end
     rescue ActiveRecord::RecordInvalid
       false

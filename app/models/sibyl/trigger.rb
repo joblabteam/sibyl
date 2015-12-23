@@ -1,6 +1,14 @@
 module Sibyl
   class Trigger # < ActiveRecord::Base
+    def initialize(sibyl)
+      @sibyl = sibyl
+    end
+
     private
+
+    def route_helpers
+      Rails.application.routes.url_helpers
+    end
 
     def self.trigger_map(trigs)
       Hash[trigs.map { |v| [v, self] }]
