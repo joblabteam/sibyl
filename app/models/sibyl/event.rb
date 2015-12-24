@@ -1,6 +1,6 @@
 module Sibyl
   class Event < ActiveRecord::Base
-    def self.create_event(kind, occurred_at = Time.now, **data)
+    def self.create_event(kind, occurred_at = Time.now, data)
       event = create!(
         kind: kind,
         occurred_at: occurred_at,
