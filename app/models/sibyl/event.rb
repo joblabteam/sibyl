@@ -8,7 +8,9 @@ module Sibyl
       )
 
       if (actions = TRIGGERS[kind])
-        actions.each { |action| action.new(self).call(kind, event) }
+        actions.each do |action|
+          TriggerWorker.perform_async(action.to_s, kind, event.id)
+        end
       end
     rescue ActiveRecord::RecordInvalid
       false
