@@ -1,27 +1,55 @@
-<p id="notice"><%= notice %></p>
+<% content_for :navbar_right do %>
+  <div class="nav-item dropdown">
+    <a class="btn btn-primary dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Filter</a>
+    <div class="dropdown-menu dropdown-menu-right" style="min-width: 250px">
+      <form action="" class="form">
+        <fieldset class="form-group dropdown-item">
+          <label for="kind"><small>Plain event name</small></label>
+          <input class="form-control" type="text" name="kind" value="<%= params[:kind] %>" placeholder="(Event)">
+        </fieldset>
+        <fieldset class="form-group dropdown-item">
+          <label for="target_property"><small>Comma, separated, list</small></label>
+          <input class="form-control" type="text" name="target_property" value="<%= params[:target_property] %>" placeholder="(Target Property)">
+        </fieldset>
+        <fieldset class="form-group dropdown-item">
+          <label for="target_value"><small>"String in quotes" / number plain</small></label>
+          <input class="form-control" type="text" name="target_value" value="<%= params[:target_value] %>" placeholder='(Filter Property Value)'>
+        </fieldset>
+        <div class="dropdown-divider"></div>
+        <fieldset class="form-group">
+          <button type="submit" class="btn btn-success btn-sm pull-xs-right m-x-1">Go!</button>
+        </fieldset>
+      </form>
+    </div>
+  </div>
+<% end %>
 
-<h1>Listing Events</h1>
+<div class="container-fluid">
+  <p id="notice"><%= notice %></p>
 
-<table>
-  <thead>
-    <tr>
-      <th>Kind</th>
-      <th>Occurred at</th>
-      <th>Data</th>
-      <th>Created at</th>
-      <th colspan="1"></th>
-    </tr>
-  </thead>
+  <h1>Listing Events</h1>
 
-  <tbody>
-    <% @events.each do |event| %>
+  <table class="table">
+    <thead>
       <tr>
-        <td><%= event.kind %></td>
-        <td><%= event.occurred_at %></td>
-        <td><%= hash_to_list event.data %></td>
-        <td><%= event.created_at %></td>
-        <td><%= link_to 'Show', event %></td>
+        <th>Kind</th>
+        <th>Occurred at</th>
+        <th>Data</th>
+        <th>Created at</th>
+        <th colspan="1"></th>
       </tr>
-    <% end %>
-  </tbody>
-</table>
+    </thead>
+
+    <tbody>
+      <% @events.each do |event| %>
+        <tr>
+          <td><%= event.kind %></td>
+          <td><%= event.occurred_at %></td>
+          <td><%= hash_to_list event.data %></td>
+          <td><%= event.created_at %></td>
+          <td><%= link_to 'Show', event, class: "btn btn-primary-outline btn-sm" %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

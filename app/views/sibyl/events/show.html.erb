@@ -1,23 +1,22 @@
-<p id="notice"><%= notice %></p>
+<div class="container">
+  <p id="notice"><%= notice %></p>
 
-<p>
-  <strong>Kind:</strong>
-  <%= @event.kind %>
-</p>
+  <h2>
+    <%= @event.kind %>
+  </h2>
 
-<p>
-  <strong>Occurred at:</strong>
-  <%= @event.occurred_at %>
-</p>
+  <p>
+    <strong>Occurred at:</strong>
+    <%= @event.occurred_at %>
+  </p>
 
-<p>
-  <strong>Data:</strong>
-  <%= nested_hash_to_list @event.data %>
-</p>
+  <p>
+    <strong>Data:</strong>
+    <%= nested_hash_to_list @event.data %>
+  </p>
 
-<p>
-  <strong>Created at:</strong>
-  <%= @event.created_at %>
-</p>
-
-<%= link_to 'Back', events_path %>
+  <p>
+    <strong>Created at:</strong>
+    <%= @event.created_at %>
+  </p>
+</div>
