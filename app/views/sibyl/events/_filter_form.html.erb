@@ -1,0 +1,24 @@
+<fieldset class="form-group dropdown-item">
+  <label for="kind"><small>Plain event name</small></label>
+  <input class="form-control" type="text" name="kind" value="<%= params[:kind] %>" placeholder="(Event)">
+</fieldset>
+<fieldset class="form-group dropdown-item">
+  <label for="target_property"><small>Comma, separated, list</small></label>
+  <input class="form-control" type="text" name="target_property" value="<%= params[:target_property] %>" placeholder="(Target property)">
+</fieldset>
+<fieldset class="form-group dropdown-item">
+  <label for="target_value"><small>"String in quotes" / number plain</small></label>
+  <input class="form-control" type="text" name="target_value" value="<%= params[:target_value] %>" placeholder='(Filter property value)'>
+</fieldset>
+<fieldset class="form-group dropdown-item">
+  <label for="date_from"><small>Date format yyyy-mm-dd</small></label>
+  <input class="form-control" type="text" name="date_from" value="<%= params[:date_from] %>" placeholder='(Date From)'>
+</fieldset>
+<fieldset class="form-group dropdown-item">
+  <label for="date_to"><small>Date format yyyy-mm-dd</small></label>
+  <input class="form-control" type="text" name="date_to" value="<%= params[:date_to] %>" placeholder='(Date to)'>
+</fieldset>
+<fieldset class="form-group dropdown-item">
+  <label for="limit"><small>Number or blank for unlimited</small></label>
+  <input class="form-control" type="text" name="limit" value="<%= params[:limit] %>" placeholder='(Limit results)'>
+</fieldset>
