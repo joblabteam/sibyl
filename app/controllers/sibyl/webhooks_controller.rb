@@ -2,15 +2,13 @@ require_dependency "sibyl/application_controller"
 
 module Sibyl
   class WebhooksController < ApplicationController
-    respond_to :json
-
     def webhook
-      p request.headers["Content-Type"]
-      p request.headers["MIME Type"]
-      p request.headers
-      data = request.request_parameters[:webhook]
-      p params
-      p data
+      if request.content_type.blank?
+        data = JSON.parse(params.except(*request.path_parameters.keys).keys[0])
+      else
+        data = request.request_parameters[:webhook]
+      end
+
       unless data.blank?
         Event.create_event "webhook_#{params[:sibyl_event]}", data
       end
