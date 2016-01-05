@@ -4,7 +4,7 @@ module Sibyl
   class WebhooksController < ApplicationController
     def webhook
       if request.content_type.blank?
-        data = JSON.parse(params.except(*request.path_parameters.keys).keys[0])
+        data = JSON.parse(request.raw_post)
       else
         data = request.request_parameters[:webhook]
       end
