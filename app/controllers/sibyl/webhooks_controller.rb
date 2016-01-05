@@ -5,7 +5,12 @@ module Sibyl
     respond_to :json
 
     def webhook
+      p request.headers["Content-Type"]
+      p request.headers["MIME Type"]
+      p request.headers
       data = request.request_parameters[:webhook]
+      p params
+      p data
       unless data.blank?
         Event.create_event "webhook_#{params[:sibyl_event]}", data
       end
