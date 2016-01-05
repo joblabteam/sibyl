@@ -3,8 +3,10 @@ require_dependency "sibyl/application_controller"
 module Sibyl
   class WebhooksController < ApplicationController
     def webhook
-      Event.create_event "webhook_#{params[:sibyl_event]}",
-        request.request_parameters[:webhook]
+      data = request.request_parameters[:webhook]
+      unless data.blank?
+        Event.create_event "webhook_#{params[:sibyl_event]}", data
+      end
 
       unless request.headers["X-Hook-Secret"].blank?
         response.headers["X-Hook-Secret"] = request.headers["X-Hook-Secret"]
