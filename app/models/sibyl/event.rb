@@ -49,5 +49,17 @@ module Sibyl
         where(query)
       end
     end
+
+    def self.operation(op, properties)
+      all
+    end
+
+    def self.date_from(from)
+      where("occurred_at >= ?", from) unless from.blank?
+    end
+
+    def self.date_to(to)
+      where("occurred_at <= ?", to) unless to.blank?
+    end
   end
 end

@@ -6,11 +6,20 @@ module Sibyl
 
     # GET /events
     def index
-      @events = Event.all.order(occurred_at: :desc).limit(50)
+      @events = Event.all
       @events = @events.where(kind: params[:kind]) unless params[:kind].blank?
-      # @events = @events.where(kind: params[:target_value]) unless params[:target_value].blank?
+      if params[:order].blank?
+        @events = @events.order(occurred_at: :desc)
+      else
+        @events = @events.order(occurred_at: params[:order].to_sym)
+      end
       @events = @events.target_property?(params[:target_property])
       @events = @events.target_property_value(params[:target_property], params[:target_value])
+      @events = @events.operation(params[:operation], params[:target_property])
+
+      @events = @events.date_from(params[:date_from]) unless params[:date_from].blank?
+      @events = @events.date_to(params[:date_to]) unless params[:date_to].blank?
+      @events = @events.limit(params[:limit].to_i) unless params[:limit].blank?
     end
 
     # GET /events/1
