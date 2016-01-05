@@ -4,6 +4,8 @@ module Sibyl
   class WebhooksController < ApplicationController
     def webhook
       data = request.request_parameters[:webhook]
+      p params
+      p data
       unless data.blank?
         Event.create_event "webhook_#{params[:sibyl_event]}", data
       end
