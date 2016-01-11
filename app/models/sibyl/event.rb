@@ -50,8 +50,14 @@ module Sibyl
       end
     end
 
-    def self.operation(op, properties)
-      all
+    def self.operation(op, property)
+      case op
+      when "count"
+      puts "HERE"
+        count
+      else
+        all
+      end
     end
 
     def self.date_from(from)

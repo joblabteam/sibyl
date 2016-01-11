@@ -2,19 +2,32 @@
   <div class="nav-item dropdown">
     <a class="btn btn-primary dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Add Metric</a>
     <div class="dropdown-menu dropdown-menu-right" style="min-width: 250px">
-      <form action="" class="form">
+      <form class="form" id="panelParamsForm">
         <%= render "sibyl/events/filter_form" %>
+        <fieldset class="form-group dropdown-item">
+          <label for="operation"><small>Operation</small></label>
+          <select class="form-control" name="operation" value="<%= params[:limit] %>">
+            <option value="count">Count records</option>
+          </select>
+        </fieldset>
         <div class="dropdown-divider"></div>
         <fieldset class="form-group">
-          <button type="submit" class="btn btn-success btn-sm pull-xs-right m-x-1">Add</button>
+          <button type="button" class="btn btn-success btn-sm pull-xs-right m-x-1" onclick="appendPanelParams(); return false;">Add</button>
         </fieldset>
       </form>
     </div>
   </div>
 <% end %>
 
+<script>
+  var eventsPath = "<%= events_path.html_safe %>";
+  var panelParams = <%= JSON.generate(@panels || []).html_safe %>;
+  var panelHTML = "<%= escape_javascript(render partial: 'panel') %>";
+</script>
+
 <div class="container-fluid">
   <p id="notice"><%= notice %></p>
 
-
+  <div class="card-columns">
+  </div>
 </div>

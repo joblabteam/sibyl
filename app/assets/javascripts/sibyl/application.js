@@ -12,4 +12,5 @@
 //
 //= require bootstrap/util
 //= require bootstrap/dropdown
+//= require sibyl/simple-bind
 //= require_tree .
