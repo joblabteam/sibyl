@@ -1,14 +1,17 @@
-SimpleBind = function(model) {
+"use strict";
+
+var SimpleBind = function(model) {
   this._model = model;
   this._el = document.querySelector('[data-sb-' + model + ']');
   if (!this._el) this._el = document;
 };
 
 SimpleBind.prototype.outputData = function(data) {
+  var nodes;
   if (data) {
     for (var attr in data) {
       if (Object.prototype.hasOwnProperty.call(data, attr)) {
-        var nodes = this.outputNodes(attr);
+        nodes = this.outputNodes(attr);
         for (var i = 0; i < nodes.length; i++) {
           var node = nodes[i];
           var format = node.attributes['data-sb-format'];
@@ -40,7 +43,7 @@ SimpleBind.prototype.outputData = function(data) {
   }
   else {
     var attribute = 'data-sb-' + this._model + '-output';
-    var nodes = this.outputNodes('', true);
+    nodes = this.outputNodes('', true);
     var output = {};
     for (var k = 0; k < nodes.length; k++)
       output[ nodes[k].attributes[attribute].value ] = nodes[k].innerHTML;
@@ -99,9 +102,9 @@ SimpleBind._interpolate = function(attr, str) {
       if (match.match(/^%R$/))
         return str !== '' ? ' ' + str : '';
       var matches;
-      if (matches = /^%t\{([^}]+)}$/.exec(match))
+      if ((matches = /^%t\{([^}]+)}$/.exec(match)))
         return str !== '' ? matches[1] : '';
-      if (matches = /^%f\{([^}]+)}$/.exec(match))
+      if ((matches = /^%f\{([^}]+)}$/.exec(match)))
         return str !== '' ? '' : matches[1];
     }
   );

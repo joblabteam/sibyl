@@ -1,19 +1,39 @@
 <% content_for :navbar_right do %>
   <div class="nav-item dropdown">
     <a class="btn btn-primary dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Add Metric</a>
-    <div class="dropdown-menu dropdown-menu-right" style="min-width: 250px">
+    <div class="dropdown-menu dropdown-menu-right" style="min-width: 350px">
       <form class="form" id="panelParamsForm">
+        <div class="container">
+          <div class="row">
+            <fieldset class="dropdown-item has-success">
+              <label for="title"><small>Title customize (plain)</small></label>
+              <input class="form-control" type="text" name="title" value="<%= params[:title] %>" placeholder="(Title customize)">
+            </fieldset>
+          </div>
+        </div>
         <%= render "sibyl/events/filter_form" %>
-        <fieldset class="form-group dropdown-item">
-          <label for="operation"><small>Operation</small></label>
-          <select class="form-control" name="operation" value="<%= params[:limit] %>">
-            <option value="count">Count records</option>
-          </select>
-        </fieldset>
-        <div class="dropdown-divider"></div>
-        <fieldset class="form-group">
-          <button type="button" class="btn btn-success btn-sm pull-xs-right m-x-1" onclick="appendPanelParams(); return false;">Add</button>
-        </fieldset>
+        <div class="container">
+          <div class="row">
+            <fieldset class="dropdown-item">
+              <label for="operation"><small>Operation</small></label><br>
+              <select class="form-control form-control-sm c-select" name="operation" value="<%= params[:operation] %>">
+                <option value="count">Count records</option>
+              </select>
+            </fieldset>
+          </div>
+          <!--
+          <div class="row">
+            <fieldset class="dropdown-item">
+              <label for="group_by"><small>Group by (property)</small></label>
+              <input class="form-control form-control-sm" type="text" name="group_by" value="<%= params[:group_by] %>" placeholder='(Group by property)'>
+            </fieldset>
+          </div>
+          -->
+          <div class="dropdown-divider"></div>
+          <fieldset class="form-group">
+            <button type="button" class="btn btn-success btn-sm pull-xs-right m-x-1" onclick="appendPanelParams(); return false;">Add</button>
+          </fieldset>
+        </div>
       </form>
     </div>
   </div>
