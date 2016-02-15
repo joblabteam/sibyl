@@ -6,7 +6,7 @@ module Sibyl
 
     def index
       @events = Event.all
-      @events = @events.where(kind: params[:kind]) unless params[:kind].blank?
+      @events = @events.in_kind(params[:kind])
       @events = if params[:order].blank?
                   @events.order(occurred_at: :desc)
                 else

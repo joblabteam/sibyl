@@ -53,10 +53,16 @@ module Sibyl
     def self.operation(op, property)
       case op
       when "count"
-      puts "HERE"
         count
       else
         all
+      end
+    end
+
+    def self.in_kind(kind)
+      unless kind.blank?
+        kind = kind.split(",").map(&:strip)
+        where(kind: kind) # WHERE kind IN ('foo', 'bar')
       end
     end
 

@@ -1,13 +1,13 @@
 <div class="container">
   <div class="row">
     <fieldset class="dropdown-item">
-      <label for="kind"><small>Event kind (plain)</small></label>
+      <label for="kind"><small>Event kind[s] (plain, comma, list)</small></label>
       <input class="form-control" type="text" name="kind" value="<%= params[:kind] %>" placeholder="(Event kind)">
     </fieldset>
   </div>
   <div class="row">
     <fieldset class="dropdown-item">
-      <label for="property"><small>Property (Comma, separated, list)</small></label>
+      <label for="property"><small>Property (plain, comma, list)</small></label>
       <input class="form-control form-control-sm" type="text" name="property" value="<%= params[:property] %>" placeholder="(Target property)">
     </fieldset>
   </div>
@@ -39,11 +39,8 @@
       <input class="form-control form-control-sm" type="text" name="limit" value="<%= params[:limit] %>" placeholder='(Limit results)'>
     </fieldset>
     <fieldset class="dropdown-item col-sm-6">
-      <label for="limit"><small>Order by</small></label><br>
-      <select class="form-control form-control-sm c-select" name="order" value="<%= params[:order] %>">
-        <option value="desc">Descending</option>
-        <option value="asc">Ascending</option>
-      </select>
+      <label for="order"><small>Order by</small></label><br>
+      <%= select_tag "order", options_for_select({ Descending: "desc", Ascending: "asc" }, params[:order]), class: "form-control form-control-sm c-select" %>
     </fieldset>
   </div>
 </div>

@@ -16,9 +16,7 @@
           <div class="row">
             <fieldset class="dropdown-item">
               <label for="operation"><small>Operation</small></label><br>
-              <select class="form-control form-control-sm c-select" name="operation" value="<%= params[:operation] %>">
-                <option value="count">Count records</option>
-              </select>
+              <%= select_tag "operation", options_for_select({ "Count records": "count" }, params[:operation]), class: "form-control form-control-sm c-select" %>
             </fieldset>
           </div>
           <!--
