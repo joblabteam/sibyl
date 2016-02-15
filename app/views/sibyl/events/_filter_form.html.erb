@@ -5,18 +5,14 @@
       <input class="form-control" type="text" name="kind" value="<%= params[:kind] %>" placeholder="(Event kind)">
     </fieldset>
   </div>
-  <div class="row">
-    <fieldset class="dropdown-item">
-      <label for="property"><small>Property (plain, comma, list)</small></label>
-      <input class="form-control form-control-sm" type="text" name="property" value="<%= params[:property] %>" placeholder="(Target property)">
-    </fieldset>
+  <hr>
+  <div class="filters-container">
+    <% params[:filters]&.each_with_index do |_, i| %>
+      <%= render "sibyl/events/filter_form_filter", i: i %>
+    <% end %>
   </div>
-  <div class="row">
-    <fieldset class="dropdown-item">
-      <label for="target_value"><small>Value ("String quoted" / number)</small></label>
-      <input class="form-control form-control-sm" type="text" name="value" value="<%= params[:value] %>" placeholder='(Filter property value)'>
-    </fieldset>
-  </div>
+  <button type="button" class="btn btn-primary btn-sm" onclick="$(this).parent().find('.filters-container').append('<%= escape_javascript(render partial: 'sibyl/events/filter_form_filter').gsub('"', "'") %>')">Add a filter</button>
+  <hr>
   <div class="row">
     <fieldset class="dropdown-item">
       <label for="previous"><small>Previous period (minutes)</small></label>
@@ -35,12 +31,12 @@
   </div>
   <div class="row">
     <fieldset class="dropdown-item col-sm-6">
-      <label for="limit"><small>Limit</small></label>
+      <label for="limit"><small>Limit (number)</small></label>
       <input class="form-control form-control-sm" type="text" name="limit" value="<%= params[:limit] %>" placeholder='(Limit results)'>
     </fieldset>
     <fieldset class="dropdown-item col-sm-6">
       <label for="order"><small>Order by</small></label><br>
-      <%= select_tag "order", options_for_select({ Descending: "desc", Ascending: "asc" }, params[:order]), class: "form-control form-control-sm c-select" %>
+      <%= select_tag "order", options_for_select({ Newest: "desc", Oldest: "asc" }, params[:order]), class: "form-control form-control-sm c-select" %>
     </fieldset>
   </div>
 </div>

@@ -1,0 +1,19 @@
+<% i ||= 0 %>
+<div class="row">
+  <fieldset class="dropdown-item">
+    <label for="filters[][property]"><small>Property (plain, comma, list)</small></label>
+    <input class="form-control form-control-sm" type="text" name="filters[][property]" value="<%= params[:filters]&.dig(i, :property) %>" placeholder="(Property target)">
+  </fieldset>
+</div>
+<div class="row">
+  <fieldset class="dropdown-item">
+    <label for="filters[][value]"><small>Filter | Value ("string" / number)</small></label>
+    <div class="input-group">
+      <div class="input-group-btn">
+        <%= select_tag "filters[][filter]", options_for_select({ "Equal to": "eq", "Not eql": "ne", "Greater": "gt", "Grtr or eql": "gte", "Less": "lt", "Less or eql": "lte", "Contains": "contains" }, params[:filters]&.dig(i, :filter)), class: "form-control form-control-sm c-select" %>
+      </div>
+      <input class="form-control form-control-sm" type="text" name="filters[][value]" value="<%= params[:filters]&.dig(i, :value) %>" placeholder='(Filter property value)'>
+    </div>
+  </fieldset>
+</div>
+<hr>

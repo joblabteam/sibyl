@@ -16,7 +16,7 @@ module Sibyl
       false
     end
 
-    def self.target_property?(properties)
+    def self.filter_property?(properties)
       if properties.blank?
         all
       else
@@ -36,14 +36,29 @@ module Sibyl
       end
     end
 
-    def self.target_property_value(properties, value)
+    def self.filter_property_value(filter, properties, value)
       if properties.blank? || value.blank?
         all
       else
         properties = properties.split(",").map { |p| "'#{p.strip}'" }
+        query = "data->#{properties.join('->')}"
 
-        query = "data->#{properties.join("->")}"
-        query += " @> '#{value}'::jsonb"
+        case filter.to_s
+        when "eq"
+          query = "(#{query})::text = '#{value}'"
+        when "ne"
+          query = "(#{query})::text != '#{value}'"
+        when "lt"
+          query = "(#{query})::text::float < #{value}"
+        when "lte"
+          query = "(#{query})::text::float <= #{value}"
+        when "gt"
+          query = "(#{query})::text::float > #{value}"
+        when "gte"
+          query = "(#{query})::text::float >= #{value}"
+        else # contains
+          query += " @> '#{value}'::jsonb"
+        end
 
         puts query
         where(query)
@@ -59,8 +74,18 @@ module Sibyl
       end
     end
 
+    def self.order_by(order)
+      if order.blank?
+        order(occurred_at: :desc)
+      else
+        order(occurred_at: order.to_sym)
+      end
+    end
+
     def self.in_kind(kind)
-      unless kind.blank?
+      if kind.blank?
+        all
+      else
         kind = kind.split(",").map(&:strip)
         where(kind: kind) # WHERE kind IN ('foo', 'bar')
       end

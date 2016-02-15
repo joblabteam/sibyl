@@ -7,13 +7,13 @@ module Sibyl
     def index
       @events = Event.all
       @events = @events.in_kind(params[:kind])
-      @events = if params[:order].blank?
-                  @events.order(occurred_at: :desc)
-                else
-                  @events.order(occurred_at: params[:order].to_sym)
-                end
-      @events = @events.target_property?(params[:property])
-      @events = @events.target_property_value(params[:property], params[:value])
+      @events = @events.order_by(params[:order])
+      params[:filters]&.each do |filter|
+        @events = @events.filter_property?(filter[:property])
+        @events = @events.filter_property_value(
+          filter[:filter], filter[:property], filter[:value]
+        )
+      end
 
       from, to = set_from_to
       @events = @events.date_from(from) unless from.blank?
