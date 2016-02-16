@@ -13,4 +13,5 @@
 //= require bootstrap/util
 //= require bootstrap/dropdown
 //= require sibyl/simple-bind
+//= require sibyl/chart.min
 //= require_tree .

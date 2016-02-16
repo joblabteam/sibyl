@@ -16,7 +16,25 @@
           <div class="row">
             <fieldset class="dropdown-item">
               <label for="operation"><small>Operation</small></label><br>
-              <%= select_tag "operation", options_for_select({ "Count records": "count" }, params[:operation]), class: "form-control form-control-sm c-select" %>
+              <%= select_tag "operation", options_for_select({ "Count events": "count", "Count unique properties": "uniq", "Group unique properties": "group", "Minimum of property": "min", "Maximum of property": "max", "Average of property": "avg", "Sum of property": "sum" }, params[:operation]), class: "form-control form-control-sm c-select" %>
+            </fieldset>
+          </div>
+          <div class="row">
+            <fieldset class="dropdown-item">
+              <label for="property"><small>Property for operation (plain, comma, list)</small></label>
+              <input class="form-control form-control-sm" type="text" name="property" value="<%= params[:property] %>" placeholder="(Property for operation)">
+            </fieldset>
+          </div>
+          <div class="row">
+            <fieldset class="dropdown-item">
+              <label for="group"><small>Group by property (plain, comma, list)</small></label>
+              <input class="form-control form-control-sm" type="text" name="group" value="<%= params[:group] %>" placeholder="(Group by property)">
+            </fieldset>
+          </div>
+          <div class="row">
+            <fieldset class="dropdown-item">
+              <label for="interval"><small>Interval (minute, hour, day, week, month, quarter ...)</small></label>
+              <input class="form-control form-control-sm" type="text" name="interval" value="<%= params[:interval] %>" placeholder="(Interval to group by)">
             </fieldset>
           </div>
           <!--

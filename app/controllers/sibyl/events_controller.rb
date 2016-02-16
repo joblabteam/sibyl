@@ -9,19 +9,29 @@ module Sibyl
       @events = @events.in_kind(params[:kind])
       @events = @events.order_by(params[:order])
       params[:filters]&.each do |filter|
+        filter = filter.last if filter.is_a? Array
         @events = @events.filter_property?(filter[:property])
         @events = @events.filter_property_value(
           filter[:filter], filter[:property], filter[:value]
         )
       end
 
-      from, to = set_from_to
-      @events = @events.date_from(from) unless from.blank?
-      @events = @events.date_to(to) unless to.blank?
+      if params[:previous].blank?
+        @events = @events.date_from params[:from] unless params[:from].blank?
+        @events = @events.date_to params[:to] unless params[:to].blank?
+      else
+        @events = @events.date_previous params[:previous]
+      end
+
       limit = set_limit
       @events = @events.limit(limit) unless limit.blank?
 
-      @events = @events.operation(params[:operation], params[:property])
+      @events = @events.interval(params[:interval]) unless params[:interval].blank?
+
+      @events = @events.group_by(params[:group], params[:order]) unless params[:group].blank?
+
+      # must come last as doesn't return a relation
+      @events = @events.operation(params[:operation], params[:property], params[:order])
 
       respond_to do |format|
         format.json do
