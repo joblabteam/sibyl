@@ -64,56 +64,70 @@ module Sibyl
       end
     end
 
-    def self.group_by(property, order)
-      order = order.blank? ? "DESC" : order
-      property = property_query(property)
+    # def self.group_by(property, order)
+      # order = order.blank? ? "DESC" : order
+      # property = property_query(property)
 
-      reorder("(#{property})::text #{order}")
-        .group("(#{property})::text")
-    end
+      # reorder("(#{property})::text #{order}")
+        # .group("(#{property})::text")
+    # end
 
     def self.operation(op, property, order)
-      order = order.blank? ? "DESC" : order
+      order = safe_order(order)
       property = property_query(property)
 
       case op
       when "count"
         # count
-        reorder("").select("COUNT(*)")# [0][:count]
+        safe_op(:count) do |sc|
+          sc.select("COUNT(*)")
+        end
       when "uniq"
         # reorder("").distinct.count("(#{property})::text")
-        reorder("").select("DISTINCT COUNT(DISTINCT (#{property})::text)")[0][:count]
+        safe_op(:count) do |sc|
+          sc.select("DISTINCT COUNT(DISTINCT (#{property})::text)")
+        end
       when "group"
-        reorder("(#{property})::text #{order}")
-          .group("(#{property})::text").count # ("(#{property})::text")
+        safe_op(:count) do |sc|
+          sc.reorder("(#{property})::text #{order}")
+            .group("(#{property})::text").count # ("(#{property})::text")
+        end
       when "min"
-        reorder("").select("MIN((#{property})::text::float)")[0][:min]
+        safe_op(:min) do |sc|
+          sc.select("MIN((#{property})::text::float)")
+        end
       when "max"
-        reorder("").select("MAX((#{property})::text::float)")[0][:max]
+        safe_op(:max) do |sc|
+          sc.select("MAX((#{property})::text::float)")
+        end
       when "avg"
-        reorder("").select("AVG((#{property})::text::float)")[0][:avg]
+        safe_op(:avg) do |sc|
+          sc.select("AVG((#{property})::text::float)")
+        end
       when "sum"
-        reorder("").select("SUM((#{property})::text::float)")[0][:sum]
+        safe_op(:sum) do |sc|
+          sc.select("SUM((#{property})::text::float)")
+        end
       else
-        all
+        where(nil)
       end
     end
 
     def self.interval(interval)
       # WARNING POTENTIAL FOR SQL INJECTION BELOW!!!
       if %w(second minute hour day week month quarter year).include? interval
+        @danger_order = false
         select("date_trunc('#{interval}', occurred_at) AS \"interval\"")
-          .reorder('"interval"')
+          .reorder('"interval" ASC')
           .group('"interval"')
       end
     end
 
     def self.order_by(order)
-      if order.blank?
-        order(occurred_at: :desc)
-      else
-        order(occurred_at: order.to_sym)
-      end
+      order = safe_order(order)
+      @danger_order = true
+
+      order(occurred_at: order.to_sym)
     end
 
     def self.in_kind(kind)
@@ -143,6 +157,18 @@ module Sibyl
 
     def self.property_query(property)
       "data->#{property_array(property).join('->')}" unless property.blank?
+    end
+
+    def self.safe_order(order)
+      order.blank? || order == "desc" ? "DESC" : order
+    end
+
+    def self.safe_op(op)
+      sc = where(nil)
+      sc = sc.reorder("") if @danger_order
+      sc = yield(sc)
+      sc.inspect
+      sc.size == 1 ? sc[0][op] : sc
     end
   end
 end

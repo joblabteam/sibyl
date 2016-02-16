@@ -28,10 +28,12 @@ module Sibyl
 
       @events = @events.interval(params[:interval]) unless params[:interval].blank?
 
-      @events = @events.group_by(params[:group], params[:order]) unless params[:group].blank?
+      # @events = @events.group_by(params[:group], params[:order]) unless params[:group].blank?
 
       # must come last as doesn't return a relation
       @events = @events.operation(params[:operation], params[:property], params[:order])
+
+
 
       respond_to do |format|
         format.json do
