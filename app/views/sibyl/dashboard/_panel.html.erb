@@ -1,9 +1,14 @@
-<div class="card" data-sb-panelx="">
-  <div class="card-block">
-    <h4 class="card-title" data-sb-panelx-output="title"></h4>
-    <h6 class="card-subtitle text-muted" data-sb-panelx-output="subtitle"></h6>
-  </div>
-  <div class="card-block content">
-    <p class="card-text display-4" data-sb-panelx-output="text"></p>
+<div id="panelx" data-sb-panelx="" data-sb-panelx-output="text" data-sb-attributes="class" data-sb-format="" data-sb-class-format="panel %t{col-xl-2 col-lg-3 col-md-4 col-xs-6}%f{col-xl-4 col-lg-6 col-md-8 col-xs-12}">
+  <div class="card">
+    <div class="card-block">
+      <div class="card-title">
+        <button type="button" class="btn btn-secondary btn-sm close-panel">x</button>
+        <h5 class="inline-block" data-sb-panelx-output="title"></h5>
+      </div>
+      <h6 class="card-subtitle text-muted" data-sb-panelx-output="subtitle"></h6>
+    </div>
+    <div class="card-block content">
+      <p class="card-text display-4" data-sb-panelx-output="text"></p>
+    </div>
   </div>
 </div>

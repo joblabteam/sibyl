@@ -2,7 +2,7 @@
   <div class="row">
     <fieldset class="dropdown-item">
       <label for="kind"><small>Event kind[s] (plain, comma, list)</small></label>
-      <input class="form-control" type="text" name="kind" value="<%= params[:kind] %>" placeholder="(Event kind)">
+      <input class="form-control" type="text" name="funnel[][kind]" value="<%= params[:kind] %>" placeholder="(Event kind)">
     </fieldset>
   </div>
   <hr>
@@ -16,27 +16,27 @@
   <div class="row">
     <fieldset class="dropdown-item">
       <label for="previous"><small>Previous period (5 days, 1 minute, 3hours ...)</small></label>
-      <input class="form-control form-control-sm" type="text" name="previous" value="<%= params[:previous] %>" placeholder='(Previous period)'>
+      <input class="form-control form-control-sm" type="text" name="funnel[][previous]" value="<%= params[:previous] %>" placeholder='(Previous period)'>
     </fieldset>
   </div>
   <div class="row">
     <fieldset class="dropdown-item col-sm-6">
       <label for="date_from"><small>Date from</small></label>
-      <input class="form-control form-control-sm" type="text" name="date_from" value="<%= params[:date_from] %>" placeholder='(Date from)'>
+      <input class="form-control form-control-sm" type="text" name="funnel[][date_from]" value="<%= params[:date_from] %>" placeholder='(Date from)'>
     </fieldset>
     <fieldset class="dropdown-item col-sm-6">
       <label for="date_from"><small>to (yyyy-mm-dd)</small></label>
-      <input class="form-control form-control-sm" type="text" name="date_to" value="<%= params[:date_to] %>" placeholder='(Date to)'>
+      <input class="form-control form-control-sm" type="text" name="funnel[][date_to]" value="<%= params[:date_to] %>" placeholder='(Date to)'>
     </fieldset>
   </div>
   <div class="row">
     <fieldset class="dropdown-item col-sm-6">
       <label for="limit"><small>Limit (number)</small></label>
-      <input class="form-control form-control-sm" type="text" name="limit" value="<%= params[:limit] %>" placeholder='(Limit results)'>
+      <input class="form-control form-control-sm" type="text" name="funnel[][limit]" value="<%= params[:limit] %>" placeholder='(Limit results)'>
     </fieldset>
     <fieldset class="dropdown-item col-sm-6">
       <label for="order"><small>Order by</small></label><br>
-      <%= select_tag "order", options_for_select({ Newest: "desc", Oldest: "asc" }, params[:order]), class: "form-control form-control-sm c-select" %>
+      <%= select_tag "funnel[][order]", options_for_select({ Newest: "desc", Oldest: "asc" }, params[:order]), class: "form-control form-control-sm c-select" %>
     </fieldset>
   </div>
 </div>

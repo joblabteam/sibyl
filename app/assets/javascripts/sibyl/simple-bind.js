@@ -77,12 +77,23 @@ SimpleBind.prototype.inputNodes = function(name) {
 
 SimpleBind.prototype.nodes = function(type, name, single) {
   var attribute = 'data-sb-' + this._model + '-' + type;
-  if (name)
-    return single ?
-      this._el.querySelector('[' + attribute + '="' + name + '"]') :
-      this._el.querySelectorAll('[' + attribute + '="' + name + '"]');
-  else
-    return this._el.querySelectorAll('[' + attribute + ']');
+  if (name) {
+    if (single) {
+      return Array.prototype.slice.call(
+          this._el.querySelector('[' + attribute + '="' + name + '"]')
+        ).concat(this._el.attributes[attribute] ? [this._el] : [])[0];
+    }
+    else {
+      return Array.prototype.slice.call(
+          this._el.querySelectorAll('[' + attribute + '="' + name + '"]')
+        ).concat(this._el.attributes[attribute] ? [this._el] : []);
+    }
+  }
+  else {
+    return Array.prototype.slice.call(
+        this._el.querySelectorAll('[' + attribute + ']')
+      ).concat(this._el.attributes[attribute] ? [this._el] : []);
+  }
 };
 
 SimpleBind.prototype.update = function() {

@@ -170,5 +170,12 @@ module Sibyl
       sc.inspect
       sc.size == 1 ? sc[0][op] : sc
     end
+
+    def self.where_funnel(property, last_property, relation)
+      relation = relation.filter_property?(last_property)
+      relation = relation.select(property_query(last_property))
+
+      filter_property?(property).where("#{property_query(property)} IN (#{relation.to_sql})")
+    end
   end
 end

@@ -3,53 +3,14 @@
     <a class="btn btn-primary dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Add Metric</a>
     <div class="dropdown-menu dropdown-menu-right" style="min-width: 400px">
       <form class="form" id="panelParamsForm">
-        <div class="container">
-          <div class="row">
-            <fieldset class="dropdown-item has-success">
-              <label for="title"><small>Title customize (plain)</small></label>
-              <input class="form-control" type="text" name="title" value="<%= params[:title] %>" placeholder="(Title customize)">
-            </fieldset>
-          </div>
+        <div id="funnelForms">
+          <%= render "funnel_form" %>
         </div>
-        <%= render "sibyl/events/filter_form" %>
-        <div class="container">
-          <div class="row">
-            <fieldset class="dropdown-item">
-              <label for="operation"><small>Operation</small></label><br>
-              <%= select_tag "operation", options_for_select({ "Count events": "count", "Count unique properties": "uniq", "Group unique properties": "group", "Minimum of property": "min", "Maximum of property": "max", "Average of property": "avg", "Sum of property": "sum" }, params[:operation]), class: "form-control form-control-sm c-select" %>
-            </fieldset>
-          </div>
-          <div class="row">
-            <fieldset class="dropdown-item">
-              <label for="property"><small>Property for operation (plain, comma, list)</small></label>
-              <input class="form-control form-control-sm" type="text" name="property" value="<%= params[:property] %>" placeholder="(Property for operation)">
-            </fieldset>
-          </div>
-          <div class="row">
-            <fieldset class="dropdown-item">
-              <label for="group"><small>Group by property (plain, comma, list)</small></label>
-              <input class="form-control form-control-sm" type="text" name="group" value="<%= params[:group] %>" placeholder="(Group by property)">
-            </fieldset>
-          </div>
-          <div class="row">
-            <fieldset class="dropdown-item">
-              <label for="interval"><small>Interval (minute, hour, day, week, month, quarter ...)</small></label>
-              <input class="form-control form-control-sm" type="text" name="interval" value="<%= params[:interval] %>" placeholder="(Interval to group by)">
-            </fieldset>
-          </div>
-          <!--
-          <div class="row">
-            <fieldset class="dropdown-item">
-              <label for="group_by"><small>Group by (property)</small></label>
-              <input class="form-control form-control-sm" type="text" name="group_by" value="<%= params[:group_by] %>" placeholder='(Group by property)'>
-            </fieldset>
-          </div>
-          -->
-          <div class="dropdown-divider"></div>
-          <fieldset class="form-group">
-            <button type="button" class="btn btn-success btn-sm pull-xs-right m-x-1" onclick="appendPanelParams(); return false;">Add</button>
-          </fieldset>
-        </div>
+        <div class="dropdown-divider"></div>
+        <fieldset class="form-group">
+          <button type="button" class="btn btn-primary btn-sm pull-xs-left m-x-1" onclick="addFunnelForm(); return false;">Funnel</button>
+          <button type="button" class="btn btn-success btn-sm pull-xs-right m-x-1" onclick="appendPanelParams(); return false;">Add</button>
+        </fieldset>
       </form>
     </div>
   </div>
@@ -59,11 +20,13 @@
   var eventsPath = "<%= events_path.html_safe %>";
   var panelParams = <%= JSON.generate(@panels || []).html_safe %>;
   var panelHTML = "<%= escape_javascript(render partial: 'panel') %>";
+  var funnelForm = "<%= escape_javascript(render partial: 'funnel_form') %>";
 </script>
 
 <div class="container-fluid">
   <p id="notice"><%= notice %></p>
 
-  <div class="card-columns">
+  <%# <div id="panels" class="card-columns"> %>
+  <div id="panels" class="row">
   </div>
 </div>

@@ -14,4 +14,5 @@
 //= require bootstrap/dropdown
 //= require sibyl/simple-bind
 //= require sibyl/chart.min
+//= require sibyl/jquery.serializejson.min
 //= require_tree .
