@@ -17,8 +17,6 @@ module Sibyl
           last_index = params[:funnel].is_a?(Array) ? i - 1 : :"#{i - 1}"
           last_funnel = params[:funnel][last_index]
           last_funnel = last_funnel.last if last_funnel.is_a? Array
-          p funnel
-          p last_funnel
 
           # Select funnelled subset of Events - SELECT ... WHERE x IN (SELECT y FROM ...)
           funnel_relation = Event.all.where_funnel(funnel[:property], last_funnel[:property], funnel_relation) if i > 0
