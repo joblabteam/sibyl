@@ -7,7 +7,7 @@ module Sibyl
     def index
       @events = Event.all
 
-      if params[:funnel]&.size > 1 # we are in a funnel!
+      if params[:funnel]&.size&.> 1 # we are in a funnel!
         funnel_relation = Event.all
         funnel_results = { funnel: [] }
         first_value = nil
@@ -43,6 +43,9 @@ module Sibyl
 
         relation = general_filters(relation, funnel)
         @events = relation.operation(funnel[:operation], funnel[:property], funnel[:order])
+      else
+        relation = Event.all
+        @events = general_filters(relation, {})
       end
 
       respond_to do |format|
@@ -79,22 +82,13 @@ module Sibyl
       params.require(:event).permit(:type, :occurred_at, :data)
     end
 
-    def set_from_to
-      if params[:previous].blank?
-        [params[:from], params[:to]]
-      else
-        seconds = 60 * params[:previous].to_i
-        [time_from_seconds(seconds), Time.now.to_s]
-      end
-    end
-
     def time_from_seconds(seconds)
       Time.at(Time.now - Time.at(seconds)).to_s
     end
 
-    def set_limit
-      limit = params[:limit].blank? ? false : params[:limit].to_i
-      if params[:operation].blank?
+    def safe_limit(funnel)
+      limit = funnel[:limit].blank? ? false : funnel[:limit].to_i
+      if funnel[:operation].blank?
         limit || 50
       else
         limit
@@ -121,7 +115,7 @@ module Sibyl
         relation = relation.date_previous funnel[:previous]
       end
 
-      limit = set_limit
+      limit = safe_limit(funnel)
       relation = relation.limit(limit) unless limit.blank?
 
       relation = relation.interval(funnel[:interval]) unless funnel[:interval].blank?
