@@ -3,6 +3,10 @@
   They will automatically be included in application.css.
 */
 
+.card-block:first-child {
+  padding-bottom: 0;
+}
+
 .close-panel {
   position: absolute;
   top: -16px;
