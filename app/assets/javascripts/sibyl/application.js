@@ -15,4 +15,5 @@
 //= require sibyl/simple-bind
 //= require sibyl/chart.min
 //= require sibyl/jquery.serializejson.min
+//= require sibyl/pako_deflate.min
 //= require_tree .

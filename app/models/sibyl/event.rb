@@ -42,22 +42,26 @@ module Sibyl
       else
         property = property_query(property)
 
-        case filter.to_s
-        when "eq"
-          query = "(#{property})::text = '#{value}'"
-        when "ne"
-          query = "(#{property})::text != '#{value}'"
-        when "lt"
-          query = "(#{property})::text::float < #{value}"
-        when "lte"
-          query = "(#{property})::text::float <= #{value}"
-        when "gt"
-          query = "(#{property})::text::float > #{value}"
-        when "gte"
-          query = "(#{property})::text::float >= #{value}"
-        else # contains
-          query += " @> '#{value}'::jsonb"
-        end
+        query = case filter.to_s
+                when "eq"
+                  "(#{property})::text = '#{value}'"
+                when "ne"
+                  "(#{property})::text != '#{value}'"
+                when "lt"
+                  "(#{property})::text::float < #{value}"
+                when "lte"
+                  "(#{property})::text::float <= #{value}"
+                when "gt"
+                  "(#{property})::text::float > #{value}"
+                when "gte"
+                  "(#{property})::text::float >= #{value}"
+                when "like"
+                  "(#{property})::text LIKE '#{value}'"
+                when "not_like"
+                  "(#{property})::text NOT LIKE '#{value}'"
+                when "contains"
+                  "#{property} @> '#{value}'::jsonb"
+                end
 
         puts query
         where(query)

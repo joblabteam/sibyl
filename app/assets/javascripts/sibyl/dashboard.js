@@ -5,38 +5,56 @@ $(function() {
   Chart.defaults.global.responsive = true;
   Chart.defaults.global.maintainAspectRatio = false;
 
+  console.log(panelParams);
   if (panelParams) {
     for (var i = 0; i < panelParams.length; i++) {
       console.log(panelParams[i]);
-
       templatePanel(i);
       getPanelData(i);
     }
   }
 
+  $('.dropdown').on('show.bs.dropdown', function () {
+    $("#editPanelButton").hide();
+    $("#funnelForms").html(funnelForm);
+  });
+
   $(document).on("click", ".card-title", function() {
-    var id = $(this).closest(".panel").attr("id");
-    var i = id.slice(5) * 1; // cut off "panel" and leave the number
+    var id = $(this).closest(".panel").attr("id").slice(5) * 1;
+    var funnel = panelParams[id].funnel;
+
     $(".dropdown-toggle").dropdown('toggle');
-    var params = panelParams[i];
-    Object.keys(params).forEach(function(param) {
-      $("#panelParamsForm").find('[name="' + param + '"]').val(params[param]);
+    $("#editPanelButton").show().attr("onclick", "editPanelParams(" + id + "); return false;");
+    Object.keys(funnel).forEach(function(panelKey, i) {
+      var panel = funnel[panelKey];
+
+      if (i !== 0) addFunnelForm();
+
+      Object.keys(panel).forEach(function(param) {
+        if (param == "filters") {
+          panel[param].forEach(function(filters, j) {
+            $("#funnelForms").find('button').eq(i).trigger("click");
+            Object.keys(filters).forEach(function(filter) {
+              console.log(filter);
+              console.log(filters[filter]);
+              // .val(panel[param]);
+              $("#funnelForms").find(".filters-container").eq(i).find('[name="funnel[][filters][][' + filter + ']"]').eq(j).val(filters[filter]);
+            });
+          });
+        }
+        else {
+          $("#funnelForms").find('[name="funnel[][' + param + ']"]').eq(i).val(panel[param]);
+        }
+      });
     });
     return false;
   });
 
   $(document).on("click", ".close-panel", function() {
-    var id = $(this).closest(".panel").attr("id");
-    var i = id.slice(5) * 1; // cut off "panel" and leave the number
+    var id = $(this).closest(".panel").attr("id").slice(5) * 1;
 
-    window.location.search = encodeURI(decodeURIComponent(window.location.search.slice(1)).split("&").filter(function(el) {
-      return !el.match('panels\\[' + i + '\\]');
-    }).map(function(el) {
-      var num = el.match('panels\\[([0-9]+)\\]')[1] * 1;
-      if (num > i)
-        el = el.replace(new RegExp("panels\\[" + num + "\\]"), "panels[" + (num - 1) + "]");
-      return el;
-    }).join("&"));
+    panelParams.splice(id, 1);
+    setLocationParams();
   });
 });
 
@@ -65,73 +83,99 @@ function outputPanelData(i, data) {
     text: ""
   });
 
-  if (Object.prototype.toString.call(data) == "[object Array]") {
+  var chartData;
+  if (Object.prototype.toString.call(data) == "[object Array]" && Object.keys(data[0]).includes("interval")) {
     $(dataBindings[i]._el).find(".content")
       .html('<canvas id="chart' + i + '" width="" height="300"></canvas>');
-    var chartData;
-    if (Object.keys(data[0]).includes("interval")) {
-      // we know the "interval" key, find the other one
-      var keys = Object.keys(data[0]).slice(); // copy don't mutate
-      keys.splice(keys.indexOf("id"), 1); // "id" is always nil, remove it
-      keys.splice(keys.indexOf("interval"), 1);
-      var key = keys[0];
-      chartData = {
-        labels: data.map(function(v) { return v.interval; }),
-        datasets: [
-          {
-            label: key,
-            data: data.map(function(v) { return v[key]; })
-          },
-        ]
-      };
-    }
-    new Chart(document.getElementById("chart" + i).getContext("2d")).Line(chartData);
+    // we know the "interval" key, find the other one
+    var keys = Object.keys(data[0]).slice(); // copy don't mutate
+    keys.splice(keys.indexOf("id"), 1); // "id" is always nil, remove it
+    keys.splice(keys.indexOf("interval"), 1);
+    var key = keys[0];
+    new Chart(document.getElementById("chart" + i).getContext("2d")).Line({
+      labels: data.map(function(v) { return v.interval; }),
+      datasets: [{
+        label: key,
+        fillColor: "#FE9B08",
+        data: data.map(function(v) { return v[key]; })
+      }]
+    });
   }
   else if (Object.prototype.toString.call(data) == "[object Object]") {
     $(dataBindings[i]._el).find(".content")
       .html('<canvas id="chart' + i + '" height="300"></canvas>');
     if (data.funnel) {
-      var chartData = {
-        labels: data.funnel.map(function(v) { return v.label + ": " + v.value; }),
+      new Chart(document.getElementById("chart" + i).getContext("2d")).Bar({
+        labels: data.funnel.map(function(v) { return v.label + " (" + v.value + ")"; }),
         datasets: [{
           label: "Funnel",
-          data: data.funnel.map(function(v) { return v.percent; }),
-        }],
-      };
-      new Chart(document.getElementById("chart" + i).getContext("2d")).Bar(chartData);
+          fillColor: "#14A2FF",
+          data: data.funnel.map(function(v) { return v.percent; })
+        }]
+      });
+      dataBindings[i].outputData({
+        title: (data.funnel[0].label || "All") + " - " + (data.funnel[data.funnel.length - 1].label || "All"),
+        subtitle: ""
+      });
     }
     else {
-      var chartData = {
-        labels: Object.keys(data),
-        datasets: [
-          {
-            label: "",
-            data: Object.keys(data).map(function (k) { return data[k]; })
-          },
-        ]
-      };
-      new Chart(document.getElementById("chart" + i).getContext("2d")).Bar(chartData);
+      // new Chart(document.getElementById("chart" + i).getContext("2d")).Bar({
+        // labels: Object.keys(data),
+        // datasets: [{
+          // label: "",
+          // fillColor: "rgba(50, 100, 200, 0.6)",
+          // data: Object.keys(data).map(function (k) { return data[k]; })
+        // }]
+      // });
+      new Chart(document.getElementById("chart" + i).getContext("2d")).Doughnut(
+        Object.keys(data).map(function (k) {
+          return {
+            label: k,
+            value: data[k]
+          };
+        })
+      );
     }
   }
   else { // Number
-    dataBindings[i].outputData({
-      text: data
-    });
+    dataBindings[i].outputData({ text: data });
   }
 }
 
-// build URL of panels query
+// add panel to end of params and visit
+function editPanelParams(id) {
+  var serialized = $('#panelParamsForm').serializeJSON();
+  panelParams[id] = serialized;
+  setLocationParams();
+}
+
+// add panel to end of params and visit
 function appendPanelParams() {
   var serialized = $('#panelParamsForm').serializeJSON();
+  panelParams.push(serialized);
+  setLocationParams();
+}
 
+// go to URL of panels query
+function setLocationParams() {
   var query = { panels: panelParams };
-  query.panels.push(serialized);
-  var queryString = $.param(query);
-
-  window.location = "?" + queryString;
+  var zlib = btoa(pako.deflate(JSON.stringify(query), { to: 'string' }));
+  var encode = encodeURIComponent(zlib);
+  window.location = "?zlib=" + encode;
+  // var queryString = $.param(query);
+  // window.location = "?" + queryString;
 }
 
 function addFunnelForm() {
   $("#funnelForms").append("<hr>");
+  $("#funnelForms").append("<hr>");
   $("#funnelForms").append(funnelForm);
+}
+
+function removeFilter(e, el) {
+  e.preventDefault();
+  e.stopPropagation();
+  el.closest(".filter-wrapper").remove();
+
+  return false;
 }
