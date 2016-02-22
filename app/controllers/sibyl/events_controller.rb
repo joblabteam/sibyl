@@ -8,6 +8,8 @@ module Sibyl
       @events = Event.all
 
       if params[:funnel]&.size&.> 1 # we are in a funnel!
+        funnel = params[:funnel].first
+        funnel = funnel.last if funnel.is_a? Array
         funnel_relation = Event.all.from("sibyl_events AS a0")
         funnel_results = { funnel: [] }
         first_value = nil

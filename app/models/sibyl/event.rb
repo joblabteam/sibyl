@@ -206,12 +206,14 @@ module Sibyl
 
     def self.where_funnel(i, property, last_property, relation, period_to)
       relation = relation.filter_property?("a#{i - 1}", last_property)
-      relation = relation.select("a#{i - 1}.*")
+                         .select("MIN(a#{i - 1}.occurred_at) AS occurred_at, #{property_query("a#{i - 1}", property)} AS jid")
+                         .group(property_query("a#{i - 1}", last_property))
+                         .reorder("")
 
       new_rel = from("sibyl_events AS a#{i}")
                 .filter_property?("a#{i}", property)
-                .joins("INNER JOIN (#{relation.to_sql}) o#{i} ON #{property_query("o#{i}", property)} = #{property_query("a#{i}", property)}")
-      new_rel = new_rel.where("a#{i}.occurred_at >= o#{i}.occurred_at")
+                .joins("INNER JOIN (#{relation.to_sql}) o#{i} ON o#{i}.jid = #{property_query("a#{i}", property)}")
+                .where("a#{i}.occurred_at >= o#{i}.occurred_at")
       new_rel = new_rel.where("a#{i}.occurred_at <= (o#{i}.occurred_at + INTERVAL ?)", period_to) unless period_to.blank?
       new_rel
     end
