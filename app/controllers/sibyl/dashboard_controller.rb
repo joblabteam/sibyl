@@ -5,7 +5,8 @@ require "json"
 module Sibyl
   class DashboardController < ApplicationController
     def index
-      @panels = JSON.parse(Zlib.inflate(Base64.decode64(params[:zlib])))["panels"] rescue []
+      @params = JSON.parse(Zlib.inflate(Base64.decode64(params[:zlib]))) rescue {}
+      @panels = @params["panels"] || []
       # @panels = if params[:panels].is_a?(Hash)
                   # params[:panels].values
                 # else

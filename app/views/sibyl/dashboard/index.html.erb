@@ -1,11 +1,20 @@
 <% content_for :navbar_right do %>
-  <div class="nav-item dropdown">
+  <div class="nav-item dropdown pull-xs-right">
     <a class="btn btn-primary dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Add Metric</a>
-    <div class="dropdown-menu dropdown-menu-right" style="min-width: 400px">
+    <div class="dropdown-menu dropdown-menu-right" style="min-width: 420px">
       <form class="form" id="panelParamsForm">
         <div id="funnelForms">
           <%= render "funnel_form" %>
         </div>
+        <div class="dropdown-divider"></div>
+        <!--<div class="container">
+          <div class="row">
+            <fieldset class="dropdown-item has-warning">
+              <label><small>Interval (minute, hour, day, week, month, quarter ...)</small></label>
+              <input class="form-control form-control-sm" type="text" name="interval" placeholder="(Interval to group funnel by)">
+            </fieldset>
+          </div>
+        </div>-->
         <div class="dropdown-divider"></div>
         <fieldset class="form-group">
           <button type="button" class="btn btn-primary btn-sm pull-xs-left m-x-1" onclick="addFunnelForm(); return false;">Funnel</button>
@@ -15,6 +24,9 @@
       </form>
     </div>
   </div>
+  <form onsubmit="setLocationParams(); return false" class="form-inline pull-xs-right">
+    <input type="text" name="title" class="form-control bg-inverse" value="<%= @params["title"] %>" placeholder="(Dashboard Title)">
+  </form>
 <% end %>
 
 <script>

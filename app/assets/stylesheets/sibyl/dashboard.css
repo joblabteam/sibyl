@@ -3,6 +3,10 @@
   They will automatically be included in application.css.
 */
 
+.card-block {
+  overflow: hidden;
+}
+
 .card-block:first-child {
   padding-bottom: 0;
 }

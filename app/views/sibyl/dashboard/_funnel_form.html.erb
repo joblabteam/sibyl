@@ -11,7 +11,7 @@
   <div class="row">
     <fieldset class="dropdown-item">
       <label><small>Operation</small></label><br>
-      <%= select_tag "funnel[][operation]", options_for_select({ "Count events": "count", "Count unique properties": "uniq", "Group unique properties": "group", "Minimum of property": "min", "Maximum of property": "max", "Average of property": "avg", "Sum of property": "sum" }), class: "form-control form-control-sm c-select" %>
+      <%= select_tag "funnel[][operation]", options_for_select({ "Count events": "count", "Count unique properties": "uniq", "Group unique properties": "group", "Minimum of number": "min", "Maximum of number": "max", "Average of number": "avg", "Sum of number": "sum", "Minimum text length": "min_length", "Maximum text length": "max_length", "Average text length": "avg_length" }), class: "form-control form-control-sm c-select" %>
     </fieldset>
   </div>
   <div class="row">

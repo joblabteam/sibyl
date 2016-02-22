@@ -11,12 +11,16 @@
       <%= render "sibyl/events/filter_form_filter", i: i %>
     <% end %>
   </div>
-  <button type="button" class="btn btn-primary btn-sm" onclick="$(this).parent().find('.filters-container').append('<%= escape_javascript(render partial: 'sibyl/events/filter_form_filter').gsub('"', "'") %>')">Add a filter</button>
+  <button type="button" class="btn btn-primary btn-sm add-filter" onclick="$(this).parent().find('.filters-container').append('<%= escape_javascript(render partial: 'sibyl/events/filter_form_filter').gsub('"', "'") %>')">Add a filter</button>
   <hr>
   <div class="row">
-    <fieldset class="dropdown-item">
-      <label><small>Previous period (5 days, 1 minute, 3hours ...)</small></label>
-      <input class="form-control form-control-sm" type="text" name="funnel[][previous]" value="<%= params[:funnel]&.dig(0, :previous) %>" placeholder='(Previous period)'>
+    <fieldset class="dropdown-item col-sm-6">
+      <label><small>Period from</small></label>
+      <input class="form-control form-control-sm" type="text" name="funnel[][previous]" value="<%= params[:funnel]&.dig(0, :previous) %>" placeholder='(Period from)'>
+    </fieldset>
+    <fieldset class="dropdown-item col-sm-6">
+      <label><small>to (5 days, 1minute, ...)</small></label>
+      <input class="form-control form-control-sm" type="text" name="funnel[][previous_to]" value="<%= params[:funnel]&.dig(0, :previous_to) %>" placeholder='(Period to)'>
     </fieldset>
   </div>
   <div class="row">

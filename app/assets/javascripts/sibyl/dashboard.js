@@ -33,11 +33,8 @@ $(function() {
       Object.keys(panel).forEach(function(param) {
         if (param == "filters") {
           panel[param].forEach(function(filters, j) {
-            $("#funnelForms").find('button').eq(i).trigger("click");
+            $("#funnelForms").find(".add-filter").eq(i).trigger("click");
             Object.keys(filters).forEach(function(filter) {
-              console.log(filter);
-              console.log(filters[filter]);
-              // .val(panel[param]);
               $("#funnelForms").find(".filters-container").eq(i).find('[name="funnel[][filters][][' + filter + ']"]').eq(j).val(filters[filter]);
             });
           });
@@ -102,21 +99,26 @@ function outputPanelData(i, data) {
     });
   }
   else if (Object.prototype.toString.call(data) == "[object Object]") {
-    $(dataBindings[i]._el).find(".content")
-      .html('<canvas id="chart' + i + '" height="300"></canvas>');
     if (data.funnel) {
-      new Chart(document.getElementById("chart" + i).getContext("2d")).Bar({
-        labels: data.funnel.map(function(v) { return v.label + " (" + v.value + ")"; }),
-        datasets: [{
-          label: "Funnel",
-          fillColor: "#14A2FF",
-          data: data.funnel.map(function(v) { return v.percent; })
-        }]
-      });
-      dataBindings[i].outputData({
-        title: (data.funnel[0].label || "All") + " - " + (data.funnel[data.funnel.length - 1].label || "All"),
-        subtitle: ""
-      });
+      if (data.funnel.length == 2) {
+        dataBindings[i].outputData({ text: Math.round(data.funnel[1].percent) + "%" });
+      }
+      else {
+        $(dataBindings[i]._el).find(".content")
+          .html('<canvas id="chart' + i + '" height="300"></canvas>');
+        new Chart(document.getElementById("chart" + i).getContext("2d")).Bar({
+          labels: data.funnel.map(function(v) { return v.label + " (" + v.value + ")"; }),
+          datasets: [{
+            label: "Funnel",
+            fillColor: "#14A2FF",
+            data: data.funnel.map(function(v) { return v.percent; })
+          }]
+        });
+        dataBindings[i].outputData({
+          title: (data.funnel[0].label || "All") + " - " + (data.funnel[data.funnel.length - 1].label || "All"),
+          subtitle: ""
+        });
+      }
     }
     else {
       // new Chart(document.getElementById("chart" + i).getContext("2d")).Bar({
@@ -127,6 +129,8 @@ function outputPanelData(i, data) {
           // data: Object.keys(data).map(function (k) { return data[k]; })
         // }]
       // });
+      $(dataBindings[i]._el).find(".content")
+        .html('<canvas id="chart' + i + '" height="300"></canvas>');
       new Chart(document.getElementById("chart" + i).getContext("2d")).Doughnut(
         Object.keys(data).map(function (k) {
           return {
@@ -158,7 +162,7 @@ function appendPanelParams() {
 
 // go to URL of panels query
 function setLocationParams() {
-  var query = { panels: panelParams };
+  var query = { panels: panelParams, title: $('[name="title"]').val() };
   var zlib = btoa(pako.deflate(JSON.stringify(query), { to: 'string' }));
   var encode = encodeURIComponent(zlib);
   window.location = "?zlib=" + encode;
