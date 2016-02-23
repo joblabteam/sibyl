@@ -193,8 +193,17 @@ module Sibyl
       sc = where(nil)
       sc = sc.reorder("") if @danger_order
       sc = yield(sc)
-      sc.inspect # this is needed to kick AR into action ¯\_(ツ)_/¯
-      sc.size == 1 ? sc[0][op] : sc
+      sc.inspect # this is needed to kick AR into action
+      # sc.size == 1 ? sc[0][op] : sc
+      if sc.size == 1
+        sc[0][op]
+      else
+        # Hash is the time interval, AR::Relation is group by uniq
+        sc = sc.map do |v|
+          v.is_a?(Array) ? v : v.serializable_hash.reject { |k| k == "id" }
+        end unless sc.is_a?(Hash)
+        sc
+      end
     end
 
     # def self.where_funnel(property, last_property, relation)

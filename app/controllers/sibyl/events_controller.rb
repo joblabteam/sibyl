@@ -26,7 +26,7 @@ module Sibyl
 
           value = funnel_relation.operation("a#{i}", funnel[:operation], funnel[:property], funnel[:order])
           first_value = value unless first_value
-          percent = (100.0 / first_value) * value
+          percent = [(100.0 / first_value) * value, 100.0].min
 
           funnel_results[:funnel] << {
             value: value,
@@ -36,7 +36,7 @@ module Sibyl
         end
 
         @events = funnel_results
-      elsif params[:funnel]
+      elsif params[:funnel] # just a single value query
         funnel = params[:funnel]
         funnel = funnel.is_a?(Hash) ? funnel[:"0"] : funnel[0]
         relation = Event.all
@@ -53,6 +53,7 @@ module Sibyl
           render json: @events
         end
         format.html {}
+        format.csv { render text: to_csv(@events) }
       end
     end
 
@@ -106,6 +107,13 @@ module Sibyl
         relation = relation.filter_property_value(
           as, filter[:filter], filter[:property], filter[:value]
         )
+
+        if params[:format] == "csv" && !funnel[:operation]
+          relation = relation.select(
+            Sibyl::Event.columns.map(&:name).reject { |v| v == "data" } <<
+              relation.property_query(filter[:property])
+          )
+        end
       end
 
       unless as && (m = as.match(/\w(\d+)/)) && m[1].to_i > 0

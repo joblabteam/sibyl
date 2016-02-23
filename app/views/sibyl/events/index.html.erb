@@ -16,7 +16,8 @@
 <div class="container-fluid">
   <p id="notice"><%= notice %></p>
 
-  <h1>Listing Events</h1>
+  <h1 class="pull-sm-left">Listing Events</h1>
+  <%= link_to "Export CSV", events_path(format: "csv", params: params), class: "pull-sm-right" %>
 
   <table class="table">
     <thead>

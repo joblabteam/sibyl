@@ -49,9 +49,13 @@ $(function() {
 
   $(document).on("click", ".close-panel", function() {
     var id = $(this).closest(".panel").attr("id").slice(5) * 1;
-
     panelParams.splice(id, 1);
     setLocationParams();
+  });
+
+  $(document).on("click", ".export-panel", function() {
+    var id = $(this).closest(".panel").attr("id").slice(5) * 1;
+    setExportParams(id);
   });
 });
 
@@ -86,7 +90,6 @@ function outputPanelData(i, data) {
       .html('<canvas id="chart' + i + '" width="" height="300"></canvas>');
     // we know the "interval" key, find the other one
     var keys = Object.keys(data[0]).slice(); // copy don't mutate
-    keys.splice(keys.indexOf("id"), 1); // "id" is always nil, remove it
     keys.splice(keys.indexOf("interval"), 1);
     var key = keys[0];
     new Chart(document.getElementById("chart" + i).getContext("2d")).Line({
@@ -161,6 +164,16 @@ function appendPanelParams() {
 }
 
 // go to URL of panels query
+function setExportParams(id) {
+  // var query = { panels: , title: $('[name="title"]').val() };
+  // var zlib = btoa(pako.deflate(JSON.stringify(query), { to: 'string' }));
+  // var encode = encodeURIComponent(zlib);
+  // window.location = "?zlib=" + encode;
+
+  var queryString = $.param(panelParams[id]);
+  window.location = eventsPath + ".csv?" + queryString;
+}
+
 function setLocationParams() {
   var query = { panels: panelParams, title: $('[name="title"]').val() };
   var zlib = btoa(pako.deflate(JSON.stringify(query), { to: 'string' }));

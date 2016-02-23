@@ -11,8 +11,21 @@
   padding-bottom: 0;
 }
 
+.close-panel, .export-panel {
+  padding-left: 0;
+  padding-right: 0;
+  width: 32px;
+  text-align: center;
+}
+
 .close-panel {
   position: absolute;
   top: -16px;
   left: -16px;
+}
+
+.export-panel {
+  position: absolute;
+  bottom: -16px;
+  right: -16px;
 }
