@@ -1,0 +1,21 @@
+<div class="container-fluid">
+  <p id="notice"><%= notice %></p>
+
+  <h1 class="pull-sm-left">All Event Kinds</h1>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Kind</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% @kinds.each do |kind| %>
+        <tr>
+          <td><%= kind.kind %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
