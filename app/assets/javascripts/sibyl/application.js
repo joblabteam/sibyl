@@ -10,6 +10,7 @@
 // Read Sprockets README (https://github.com/sstephenson/sprockets#sprockets-directives) for details
 // about supported directives.
 //
+//= require sibyl/jquery-2.1.4.min
 //= require bootstrap/util
 //= require bootstrap/dropdown
 //= require sibyl/simple-bind

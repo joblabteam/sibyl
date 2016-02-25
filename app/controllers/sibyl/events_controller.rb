@@ -10,39 +10,60 @@ module Sibyl
       if params[:funnel]&.size&.> 1 # we are in a funnel!
         funnel = params[:funnel].first
         funnel = funnel.last if funnel.is_a? Array
-        funnel_relation = Event.all.from("sibyl_events AS a0")
-        funnel_results = { funnel: [] }
-        first_value = nil
 
-        params[:funnel]&.each_with_index do |funnel, i|
-          funnel = funnel.last if funnel.is_a? Array
-          last_index = params[:funnel].is_a?(Array) ? i - 1 : :"#{i - 1}"
-          last_funnel = params[:funnel][last_index]
-          last_funnel = last_funnel.last if last_funnel.is_a? Array
+        if funnel[:group].blank? # dropoffs funnel
+          funnel_relation = Event.all.from("sibyl_events AS a0")
+          funnel_results = { funnel: [] }
+          first_value = nil
 
-          # Select funnelled subset of Events - SELECT ... WHERE x IN (SELECT y FROM ...)
-          funnel_relation = Event.all.where_funnel(i, funnel[:property], last_funnel[:property], funnel_relation, funnel[:previous_to]) if i > 0
-          funnel_relation = general_filters("a#{i}", funnel_relation, funnel)
+          params[:funnel]&.each_with_index do |funnel, i|
+            funnel = funnel.last if funnel.is_a? Array
+            last_index = params[:funnel].is_a?(Array) ? i - 1 : :"#{i - 1}"
+            last_funnel = params[:funnel][last_index]
+            last_funnel = last_funnel.last if last_funnel.is_a? Array
 
-          value = funnel_relation.operation("a#{i}", funnel[:operation], funnel[:property], funnel[:order])
-          first_value = value unless first_value
-          percent = [(100.0 / first_value) * value, 100.0].min
+            funnel_relation = Event.all.where_funnel(i, funnel[:property], last_funnel[:property], funnel_relation, funnel[:previous_to]) if i > 0
+            funnel_relation = general_filters("a#{i}", funnel_relation, funnel)
 
-          funnel_results[:funnel] << {
-            value: value,
-            percent: percent,
-            label: funnel[:title].blank? ? funnel[:kind] : funnel[:title]
-          }
+            value = funnel_relation.operation("a#{i}", funnel[:operation], Event.property_query("a#{i}", funnel[:property]), funnel[:order])
+            p value
+            first_value = value unless first_value
+            percent = [(100.0 / first_value) * value, 100.0].min
+
+            funnel_results[:funnel] << {
+              value: value,
+              percent: percent,
+              label: funnel[:title].blank? ? funnel[:kind] : funnel[:title]
+            }
+          end
+
+          @events = funnel_results
+        else # multi calculation funnel
+          params[:funnel]&.each_with_index do |funnel, i|
+            funnel = funnel.last if funnel.is_a? Array
+
+            relation = Event.all.from("sibyl_events AS a#{i}")
+            relation = relation.from("(#{funnel_relation.to_sql}) a#{i - 1}") if i > 0
+            relation = general_filters("a#{i}", relation, funnel)
+            if i == 0
+              funnel_relation = relation.operation("a#{i}", funnel[:operation], Event.property_query("a#{i}", funnel[:property]), funnel[:order], primitive: false)
+            else
+              funnel_relation = relation.operation("a#{i}", funnel[:operation], funnel[:group], funnel[:order], primitive: false)
+            end
+            funnel_relation = funnel_relation.group_by("a#{i}", funnel[:group], funnel[:order]) unless funnel[:group].blank? if i < params[:funnel].size - 1
+
+            if i == params[:funnel].size - 1
+              @events = funnel_relation.to_a[0][funnel[:operation]]
+            end
+          end
         end
-
-        @events = funnel_results
       elsif params[:funnel] # just a single value query
         funnel = params[:funnel]
         funnel = funnel.is_a?(Hash) ? funnel[:"0"] : funnel[0]
         relation = Event.all
 
         relation = general_filters(relation, funnel)
-        @events = relation.operation(funnel[:operation], funnel[:property], funnel[:order])
+        @events = relation.operation(funnel[:operation], Event.property_query(funnel[:property]), funnel[:order])
       else
         relation = Event.all
         @events = general_filters(relation, {})
@@ -55,6 +76,10 @@ module Sibyl
         format.html {}
         format.csv { render text: to_csv(@events) }
       end
+    end
+
+    def kinds
+      @kinds = Event.select(:kind).distinct.order(:kind)
     end
 
     def create
@@ -116,6 +141,7 @@ module Sibyl
         end
       end
 
+      # ignore dates in later stages of a funnel
       unless as && (m = as.match(/\w(\d+)/)) && m[1].to_i > 0
         relation = relation.date_from funnel[:from] unless funnel[:from].blank?
         relation = relation.date_to funnel[:to] unless funnel[:to].blank?
@@ -128,7 +154,6 @@ module Sibyl
 
       relation = relation.interval(funnel[:interval]) unless funnel[:interval].blank?
 
-      # @events = @events.group_by(funnel[:group], funnel[:order]) unless funnel[:group].blank?
       relation
     end
   end

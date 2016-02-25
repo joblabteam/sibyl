@@ -72,60 +72,60 @@ module Sibyl
       end
     end
 
-    # def self.group_by(property, order)
-      # order = order.blank? ? "DESC" : order
-      # property = property_query(property)
-
-      # reorder("(#{property})::text #{order}")
-        # .group("(#{property})::text")
-    # end
-
-    def self.operation(as = nil, op, property, order)
-      order = safe_order(order)
+    def self.group_by(as = nil, property, order)
+      order = order.blank? ? "DESC" : order
       property = property_query(as, property)
+
+      reorder("(#{property})::text #{order}")
+        .group("(#{property})::text")
+    end
+
+    def self.operation(as = nil, op, property, order, primitive: true)
+      order = safe_order(order)
+      # property = property_query(as, property)
 
       case op
       when "count"
         # count
-        safe_op(:count) do |sc|
+        safe_op(:count, primitive) do |sc|
           sc.select("COUNT(*)")
         end
       when "uniq"
         # reorder("").distinct.count("(#{property})::text")
-        safe_op(:count) do |sc|
+        safe_op(:count, primitive) do |sc|
           sc.select("DISTINCT COUNT(DISTINCT (#{property})::text)")
         end
       when "group"
-        safe_op(:count) do |sc|
+        safe_op(:count, primitive) do |sc|
           sc.reorder("(#{property})::text #{order}")
             .group("(#{property})::text").count # ("(#{property})::text")
         end
       when "min"
-        safe_op(:min) do |sc|
+        safe_op(:min, primitive) do |sc|
           sc.select("MIN((#{property})::text::float)")
         end
       when "max"
-        safe_op(:max) do |sc|
+        safe_op(:max, primitive) do |sc|
           sc.select("MAX((#{property})::text::float)")
         end
       when "avg"
-        safe_op(:avg) do |sc|
+        safe_op(:avg, primitive) do |sc|
           sc.select("AVG((#{property})::text::float)")
         end
       when "sum"
-        safe_op(:sum) do |sc|
+        safe_op(:sum, primitive) do |sc|
           sc.select("SUM((#{property})::text::float)")
         end
       when "min_length"
-        safe_op(:min) do |sc|
+        safe_op(:min, primitive) do |sc|
           sc.select("MIN(LENGTH((#{property})::text))")
         end
       when "max_length"
-        safe_op(:max) do |sc|
+        safe_op(:max, primitive) do |sc|
           sc.select("MAX(LENGTH((#{property})::text))")
         end
       when "avg_length"
-        safe_op(:avg) do |sc|
+        safe_op(:avg, primitive) do |sc|
           sc.select("AVG(LENGTH((#{property})::text))")
         end
       else
@@ -189,19 +189,22 @@ module Sibyl
       order.blank? || order == "desc" ? "DESC" : order
     end
 
-    def self.safe_op(op)
+    def self.safe_op(op, primitive)
       sc = where(nil)
       sc = sc.reorder("") if @danger_order
       sc = yield(sc)
-      sc.inspect # this is needed to kick AR into action
-      # sc.size == 1 ? sc[0][op] : sc
-      if sc.size == 1
-        sc[0][op]
+      if primitive
+        sc.inspect # this is needed to kick AR into action
+        if sc.size == 1
+          sc[0][op]
+        else
+          # Hash is the time interval, AR::Relation is group by uniq
+          sc = sc.map do |v|
+            v.is_a?(Array) ? v : v.serializable_hash.reject { |k| k == "id" }
+          end unless sc.is_a?(Hash)
+          sc
+        end
       else
-        # Hash is the time interval, AR::Relation is group by uniq
-        sc = sc.map do |v|
-          v.is_a?(Array) ? v : v.serializable_hash.reject { |k| k == "id" }
-        end unless sc.is_a?(Hash)
         sc
       end
     end
@@ -216,13 +219,12 @@ module Sibyl
     def self.where_funnel(i, property, last_property, relation, period_to)
       relation = relation.filter_property?("a#{i - 1}", last_property)
                          .select("MIN(a#{i - 1}.occurred_at) AS occurred_at, #{property_query("a#{i - 1}", property)} AS jid")
-                         .group(property_query("a#{i - 1}", last_property))
-                         .reorder("")
+      relation = relation.group(property_query("a#{i - 1}", last_property)).reorder("")
 
       new_rel = from("sibyl_events AS a#{i}")
                 .filter_property?("a#{i}", property)
                 .joins("INNER JOIN (#{relation.to_sql}) o#{i} ON o#{i}.jid = #{property_query("a#{i}", property)}")
-                .where("a#{i}.occurred_at >= o#{i}.occurred_at")
+      new_rel = new_rel.where("a#{i}.occurred_at >= o#{i}.occurred_at")
       new_rel = new_rel.where("a#{i}.occurred_at <= (o#{i}.occurred_at + INTERVAL ?)", period_to) unless period_to.blank?
       new_rel
     end

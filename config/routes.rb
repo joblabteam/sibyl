@@ -3,5 +3,7 @@ Sibyl::Engine.routes.draw do
 
   resources :dashboard, only: [:index]
 
-  resources :events
+  resources :events do
+    get :kinds, on: :collection
+  end
 end
