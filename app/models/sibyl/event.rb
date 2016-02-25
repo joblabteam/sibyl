@@ -85,6 +85,11 @@ module Sibyl
       # property = property_query(as, property)
 
       case op
+      when "all"
+        # count
+        safe_op(:x, primitive) do |sc|
+          sc.select("(#{property})::text AS #{property.gsub('data->', '').gsub('->', '_').gsub("'", '').gsub(/\W/, '')}, occurred_at AS interval")
+        end
       when "count"
         # count
         safe_op(:count, primitive) do |sc|

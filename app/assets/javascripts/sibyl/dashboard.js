@@ -85,21 +85,37 @@ function outputPanelData(i, data) {
   });
 
   var chartData;
-  if (Object.prototype.toString.call(data) == "[object Array]" && Object.keys(data[0]).includes("interval")) {
-    $(dataBindings[i]._el).find(".content")
-      .html('<canvas id="chart' + i + '" width="" height="300"></canvas>');
-    // we know the "interval" key, find the other one
-    var keys = Object.keys(data[0]).slice(); // copy don't mutate
-    keys.splice(keys.indexOf("interval"), 1);
-    var key = keys[0];
-    new Chart(document.getElementById("chart" + i).getContext("2d")).Line({
-      labels: data.map(function(v) { return v.interval; }),
-      datasets: [{
-        label: key,
-        fillColor: "#FE9B08",
-        data: data.map(function(v) { return v[key]; })
-      }]
-    });
+  if (Object.prototype.toString.call(data) == "[object Array]") {
+    if (Object.keys(data[0]).includes("interval")) {
+      $(dataBindings[i]._el).find(".content")
+        .html('<canvas id="chart' + i + '" width="" height="300"></canvas>');
+      // we know the "interval" key, find the other one
+      var keys = Object.keys(data[0]).slice(); // copy don't mutate
+      keys.splice(keys.indexOf("interval"), 1);
+      var key = keys[0];
+      new Chart(document.getElementById("chart" + i).getContext("2d")).Line({
+        labels: data.map(function(v) { return v.interval; }),
+        datasets: [{
+          label: key,
+          fillColor: "#FE9B08",
+          data: data.map(function(v) { return (v[key] * 1); })
+        }]
+      });
+    }
+    else {
+      $(dataBindings[i]._el).find(".content")
+        .html('<canvas id="chart' + i + '" width="" height="300"></canvas>');
+      var keys = Object.keys(data[0]).slice(); // copy don't mutate
+      var key = keys[0];
+      new Chart(document.getElementById("chart" + i).getContext("2d")).Line({
+        labels: data.map(function() { return key; }),
+        datasets: [{
+          label: key,
+          fillColor: "#FE9B08",
+          data: data.map(function(v) { return (v[key] * 1); })
+        }]
+      });
+    }
   }
   else if (Object.prototype.toString.call(data) == "[object Object]") {
     if (data.funnel) {

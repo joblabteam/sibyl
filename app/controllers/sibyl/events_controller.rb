@@ -63,7 +63,11 @@ module Sibyl
         relation = Event.all
 
         relation = general_filters(relation, funnel)
-        @events = relation.operation(funnel[:operation], Event.property_query(funnel[:property]), funnel[:order])
+        unless funnel[:group].blank?
+          relation = relation.group_by(funnel[:group], funnel[:order])
+        end
+        relation = relation.operation(funnel[:operation], Event.property_query(funnel[:property]), funnel[:order])
+        @events = relation
       else
         relation = Event.all
         @events = general_filters(relation, {})
