@@ -60,9 +60,9 @@ module Sibyl
                 when "not_like"
                   "(#{property})::text NOT LIKE '#{value}'"
                 when "blank"
-                  "(#{property})::text IS NULL OR (#{property})::text = '\"\"'"
+                  "(#{property})::text IS NULL OR (#{property})::text = 'null' OR (#{property})::text = '\"\"'"
                 when "not_blank"
-                  "(#{property})::text IS NOT NULL AND (#{property})::text != '\"\"'"
+                  "(#{property})::text IS NOT NULL AND (#{property})::text != 'null' AND (#{property})::text != '\"\"'"
                 when "contains"
                   "#{property} @> '#{value}'::jsonb"
                 end
