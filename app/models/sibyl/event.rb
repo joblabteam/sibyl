@@ -1,19 +1,23 @@
 module Sibyl
   class Event < ActiveRecord::Base
+    after_commit :queue_triggers, on: :create
+
     def self.create_event(kind, occurred_at = Time.now, data)
-      event = create!(
+      create!(
         kind: kind,
         occurred_at: occurred_at,
         data: data
       )
-
-      if (actions = TRIGGERS[kind])
-        actions.each do |action|
-          TriggerWorker.perform_async(action.to_s, kind, event.id)
-        end
-      end
     rescue ActiveRecord::RecordInvalid
       false
+    end
+
+    def queue_triggers
+      if (actions = TRIGGERS[kind])
+        actions.each do |action|
+          SibylTriggerWorker.perform_async(action.to_s, kind, id)
+        end
+      end
     end
 
     def self.filter_property?(as = nil, property)

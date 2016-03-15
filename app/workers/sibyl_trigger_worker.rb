@@ -1,4 +1,4 @@
-class TriggerWorker
+class SibylTriggerWorker
   include Sidekiq::Worker
 
   def perform(action_s, kind, event_id)
