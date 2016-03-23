@@ -12,6 +12,9 @@ module Sibyl
       false
     end
 
+    # `record` is now the preferred name
+    singleton_class.send :alias_method, :record, :create_event
+
     def queue_triggers
       if (actions = TRIGGERS[kind])
         actions.each do |action|
