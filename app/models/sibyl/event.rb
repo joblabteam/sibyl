@@ -229,8 +229,10 @@ module Sibyl
     # end
 
     def self.where_funnel(i, property, last_property, relation, period_to)
+      p property
+      p last_property
       relation = relation.filter_property?("a#{i - 1}", last_property)
-                         .select("MIN(a#{i - 1}.occurred_at) AS occurred_at, #{property_query("a#{i - 1}", property)} AS jid")
+                         .select("MIN(a#{i - 1}.occurred_at) AS occurred_at, #{property_query("a#{i - 1}", last_property)} AS jid")
       relation = relation.group(property_query("a#{i - 1}", last_property)).reorder("")
 
       new_rel = from("sibyl_events AS a#{i}")
