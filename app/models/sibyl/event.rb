@@ -2,7 +2,7 @@ module Sibyl
   class Event < ActiveRecord::Base
     after_commit :queue_triggers, on: :create
 
-    def self.create_event(kind, occurred_at = Time.now, data)
+    def self.record(kind, occurred_at = Time.now, data)
       create!(
         kind: kind,
         occurred_at: occurred_at,
@@ -13,7 +13,12 @@ module Sibyl
     end
 
     # `record` is now the preferred name
-    singleton_class.send :alias_method, :record, :create_event
+    # singleton_class.send :alias_method, :record, :create_event
+    def self.create_event(kind, occurred_at = Time.now, data)
+      puts "Sibyl Depreciation: use `record` instead of `create_event` " \
+           "#{caller_locations(1, 1)[0]}"
+      record(kind, occurred_at, data)
+    end
 
     def queue_triggers
       if (actions = TRIGGERS[kind])
