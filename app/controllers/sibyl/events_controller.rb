@@ -7,8 +7,9 @@ module Sibyl
     def index
       @events = Event.all
 
-      if params[:funnel]&.size&.> 1 # we are in a funnel!
-        funnel = params[:funnel].first
+      params_funnel = params[:funnel].to_unsafe_h
+      if params_funnel&.size&.> 1 # we are in a funnel!
+        funnel = params_funnel.first
         funnel = funnel.last if funnel.is_a? Array
 
         if funnel[:group].blank? # dropoffs funnel
@@ -16,10 +17,10 @@ module Sibyl
           funnel_results = { funnel: [] }
           first_value = nil
 
-          params[:funnel]&.each_with_index do |funnel, i|
+          params_funnel&.each_with_index do |funnel, i|
             funnel = funnel.last if funnel.is_a? Array
-            last_index = params[:funnel].is_a?(Array) ? i - 1 : :"#{i - 1}"
-            last_funnel = params[:funnel][last_index]
+            last_index = params_funnel.is_a?(Array) ? i - 1 : :"#{i - 1}"
+            last_funnel = params_funnel[last_index]
             last_funnel = last_funnel.last if last_funnel.is_a? Array
 
             funnel_relation = Event.all.where_funnel(i, funnel[:property], last_funnel[:property], funnel_relation, funnel[:previous_to]) if i > 0
@@ -39,7 +40,7 @@ module Sibyl
 
           @events = funnel_results
         else # multi calculation funnel
-          params[:funnel]&.each_with_index do |funnel, i|
+          params_funnel&.each_with_index do |funnel, i|
             funnel = funnel.last if funnel.is_a? Array
 
             relation = Event.all.from("sibyl_events AS a#{i}")
@@ -50,15 +51,15 @@ module Sibyl
             else
               funnel_relation = relation.operation("a#{i}", funnel[:operation], funnel[:group], funnel[:order], primitive: false)
             end
-            funnel_relation = funnel_relation.group_by("a#{i}", funnel[:group], funnel[:order]) unless funnel[:group].blank? if i < params[:funnel].size - 1
+            funnel_relation = funnel_relation.group_by("a#{i}", funnel[:group], funnel[:order]) unless funnel[:group].blank? if i < params_funnel.size - 1
 
-            if i == params[:funnel].size - 1
+            if i == params_funnel.size - 1
               @events = funnel_relation.to_a[0][funnel[:operation]]
             end
           end
         end
-      elsif params[:funnel] # just a single value query
-        funnel = params[:funnel]
+      elsif params_funnel # just a single value query
+        funnel = params_funnel
         funnel = funnel.is_a?(Hash) ? funnel[:"0"] : funnel[0]
         relation = Event.all
 
