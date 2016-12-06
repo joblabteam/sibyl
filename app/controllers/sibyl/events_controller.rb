@@ -7,7 +7,14 @@ module Sibyl
     def index
       @events = Event.all
 
-      params_funnel = params[:funnel].to_unsafe_h
+      params_funnel = nil
+      if params[:funnel]
+        params_funnel = if params[:funnel].is_a?(Array)
+                          params[:funnel].map(&:to_unsafe_h)
+                        else
+                          params[:funnel].to_unsafe_h
+                        end
+      end
       if params_funnel&.size&.> 1 # we are in a funnel!
         funnel = params_funnel.first
         funnel = funnel.last if funnel.is_a? Array
