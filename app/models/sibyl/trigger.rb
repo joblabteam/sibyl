@@ -4,12 +4,6 @@ module Sibyl
       @sibyl = sibyl
     end
 
-    private
-
-    def route_helpers
-      Rails.application.routes.url_helpers
-    end
-
     def self.trigger_map(trigs)
       Hash[trigs.map { |v| [v, self] }]
     end
@@ -19,6 +13,12 @@ module Sibyl
       trigger_map(trigs).each do |trigger, action|
         TRIGGERS[trigger] = Array(TRIGGERS[trigger]) << action
       end
+    end
+
+    protected
+
+    def route_helpers
+      Rails.application.routes.url_helpers
     end
   end
 end
