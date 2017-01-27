@@ -21,7 +21,14 @@ module Sibyl
     end
 
     def queue_triggers
-      triggers = TRIGGERS.select { |trigger, _actions| kind.match(trigger) }
+      triggers = TRIGGERS.select do |trigger, _actions|
+        if trigger.is_a?(Regexp)
+          kind =~ trigger
+        else
+          kind == trigger
+        end
+      end
+
       triggers.each do |_trigger, actions|
         actions.each do |action|
           SibylTriggerWorker.perform_async(action.to_s, kind, id)
