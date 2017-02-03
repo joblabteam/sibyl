@@ -17,7 +17,7 @@
   <p id="notice"><%= notice %></p>
 
   <h1 class="pull-sm-left">Listing Events</h1>
-  <%= link_to "Export CSV", events_path(format: "csv", params: params), class: "pull-sm-right" %><br>
+  <%= link_to "Export CSV", events_path(format: "csv", params: params.except(:action, :controller).to_unsafe_h), class: "pull-sm-right" %><br>
   <%= link_to "Event Kinds", kinds_events_path, class: "pull-sm-right" %>
 
   <table class="table">
