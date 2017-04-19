@@ -120,7 +120,7 @@ function outputPanelData(i, data) {
   else if (Object.prototype.toString.call(data) == "[object Object]") {
     if (data.funnel) {
       if (data.funnel.length == 2) {
-        dataBindings[i].outputData({ text: Math.round(data.funnel[1].percent) + "%" });
+        dataBindings[i].outputData({ text: (+parseFloat(data.funnel[1].percent).toFixed(2)) + "%" });
       }
       else {
         $(dataBindings[i]._el).find(".content")
