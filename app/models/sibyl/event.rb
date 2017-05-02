@@ -36,7 +36,7 @@ module Sibyl
       end
     end
 
-    def self.filter_property?(as = nil, property)
+    def self.filter_property?(property)
       if property.blank?
         all
       else
@@ -46,7 +46,7 @@ module Sibyl
         properties.each_with_index do |property, i|
           # data?'foo' AND data->'foo'?'bar' AND data->'foo'->'bar'?'baz'
           query += " AND " unless i == 0
-          query += "#{as}#{'.' if as}data"
+          query += "data"
           query += "->" unless properties[0...i].empty?
           query += properties[0...i].join("->")
           query += "?#{property}"
@@ -56,11 +56,11 @@ module Sibyl
       end
     end
 
-    def self.filter_property_value(as = nil, filter, property, value)
+    def self.filter_property_value(filter, property, value)
       if property.blank? || value.blank?
         all
       else
-        property = property_query(as, property)
+        property = property_query(property)
 
         query = case filter.to_s
                 when "eq"
@@ -87,20 +87,19 @@ module Sibyl
                   "#{property} @> '#{value}'::jsonb"
                 end
 
-        puts query
         where(query)
       end
     end
 
-    def self.group_by(as = nil, property, order)
+    def self.group_by(property, order)
       order = order.blank? ? "DESC" : order
-      property = property_query(as, property)
+      property = property_query(property)
 
       reorder("(#{property})::text #{order}")
         .group("(#{property})::text")
     end
 
-    def self.operation(as = nil, op, property, order, primitive: true)
+    def self.operation(op, property, order, primitive: true)
       order = safe_order(order)
       # property = property_query(as, property)
 
@@ -118,7 +117,13 @@ module Sibyl
       when "uniq"
         # reorder("").distinct.count("(#{property})::text")
         safe_op(:count, primitive) do |sc|
-          sc.select("DISTINCT COUNT(DISTINCT (#{property})::text)")
+          # sc.select("DISTINCT COUNT(DISTINCT (#{property})::text)")
+          # Optimized:
+          # in PG `SELECT count(DISTINCT prop)` is a bit slower than
+          # `SELECT count(*) FROM (SELECT DISTINCT prop)`
+          unscoped.select("count(*)").from(
+            "(#{sc.select("DISTINCT #{property}").reorder('').to_sql}) sub"
+          )
         end
       when "group"
         safe_op(:count, primitive) do |sc|
@@ -168,19 +173,19 @@ module Sibyl
       end
     end
 
-    def self.order_by(as = nil, order)
+    def self.order_by(order)
       order = safe_order(order)
       @danger_order = true
 
-      order("#{as}#{'.' if as}occurred_at #{order.to_sym}")
+      order(occurred_at: order.to_sym)
     end
 
-    def self.in_kind(as = nil, kind)
+    def self.in_kind(kind)
       if kind.blank?
         all
       else
         kind = kind.split(",").map(&:strip)
-        where("#{as}#{"." if as}kind": kind) # WHERE kind IN ('foo', 'bar')
+        where(kind: kind) # WHERE kind IN ('foo', 'bar')
       end
     end
 
@@ -204,10 +209,8 @@ module Sibyl
       property.split(",").map { |p| "'#{p.strip}'" } unless property.blank?
     end
 
-    def self.property_query(as = nil, property)
-      unless property.blank?
-        "#{as}#{'.' if as}data->#{property_array(property).join('->')}"
-      end
+    def self.property_query(property)
+      "data->#{property_array(property).join('->')}" unless property.blank?
     end
 
     def self.safe_order(order)
@@ -234,26 +237,26 @@ module Sibyl
       end
     end
 
-    # def self.where_funnel(property, last_property, relation)
-      # relation = relation.filter_property?(last_property)
-      # relation = relation.select(property_query(last_property))
+    def self.where_funnel(property, last_property, relation)
+      relation = relation.filter_property?(last_property).reorder("")
+      relation = relation.select(property_query(last_property))
 
-      # filter_property?(property).where("#{property_query(property)} IN (#{relation.to_sql})")
-    # end
-
-    def self.where_funnel(i, property, last_property, relation, period_to)
-      p property
-      p last_property
-      relation = relation.filter_property?("a#{i - 1}", last_property)
-                         .select("MIN(a#{i - 1}.occurred_at) AS occurred_at, #{property_query("a#{i - 1}", last_property)} AS jid")
-      relation = relation.group(property_query("a#{i - 1}", last_property)).reorder("")
-
-      new_rel = from("sibyl_events AS a#{i}")
-                .filter_property?("a#{i}", property)
-                .joins("INNER JOIN (#{relation.to_sql}) o#{i} ON o#{i}.jid = #{property_query("a#{i}", property)}")
-      new_rel = new_rel.where("a#{i}.occurred_at >= o#{i}.occurred_at")
-      new_rel = new_rel.where("a#{i}.occurred_at <= (o#{i}.occurred_at + INTERVAL ?)", period_to) unless period_to.blank?
-      new_rel
+      filter_property?(property).where("#{property_query(property)} IN (#{relation.to_sql})")
     end
+
+    # def self.where_funnel(i, property, last_property, relation, period_to)
+      # p property
+      # p last_property
+      # relation = relation.filter_property?("a#{i - 1}", last_property)
+                         # .select("MIN(a#{i - 1}.occurred_at) AS occurred_at, #{property_query("a#{i - 1}", last_property)} AS jid")
+      # relation = relation.group(property_query("a#{i - 1}", last_property)).reorder("")
+
+      # new_rel = from("sibyl_events AS a#{i}")
+                # .filter_property?("a#{i}", property)
+                # .joins("INNER JOIN (#{relation.to_sql}) o#{i} ON o#{i}.jid = #{property_query("a#{i}", property)}")
+      # new_rel = new_rel.where("a#{i}.occurred_at >= o#{i}.occurred_at")
+      # new_rel = new_rel.where("a#{i}.occurred_at <= (o#{i}.occurred_at + INTERVAL ?)", period_to) unless period_to.blank?
+      # new_rel
+    # end
   end
 end

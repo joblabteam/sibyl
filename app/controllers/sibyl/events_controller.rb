@@ -19,8 +19,19 @@ module Sibyl
         funnel = params_funnel.first
         funnel = funnel.last if funnel.is_a? Array
 
+        from = previous = nil
+        params_funnel&.each do |funnel|
+          funnel = funnel.last if funnel.is_a? Array
+
+          from = funnel[:from] if funnel[:from].present?
+          funnel[:from] = from if funnel[:from].blank?
+          previous = funnel[:previous] if funnel[:previous].present?
+          funnel[:previous] = previous if funnel[:previous].blank?
+        end
+
         if funnel[:group].blank? # dropoffs funnel
-          funnel_relation = Event.all.from("sibyl_events AS a0")
+          # funnel_relation = Event.all.from("sibyl_events AS a0")
+          funnel_relation = Event.all
           funnel_results = { funnel: [] }
           first_value = nil
 
@@ -31,18 +42,15 @@ module Sibyl
             last_funnel = last_funnel.last if last_funnel.is_a? Array
 
             funnel_relation = Event.all.where_funnel(
-              i,
               funnel[:property],
               last_funnel[:property],
-              funnel_relation,
-              funnel[:previous_to]
+              funnel_relation
             ) if i > 0
             funnel_relation = general_filters("a#{i}", funnel_relation, funnel)
 
             value = funnel_relation.operation(
-              "a#{i}",
               funnel[:operation],
-              Event.property_query("a#{i}", funnel[:property]),
+              Event.property_query(funnel[:property]),
               funnel[:order]
             )
             first_value = value unless first_value
@@ -60,22 +68,21 @@ module Sibyl
           params_funnel&.each_with_index do |funnel, i|
             funnel = funnel.last if funnel.is_a? Array
 
-            relation = Event.all.from("sibyl_events AS a#{i}")
+            # relation = Event.all.from("sibyl_events AS a#{i}")
+            relation = Event.all
             relation = relation.from(
               "(#{funnel_relation.to_sql}) a#{i - 1}"
             ) if i > 0
             relation = general_filters("a#{i}", relation, funnel)
             if i.zero?
               funnel_relation = relation.operation(
-                "a#{i}",
                 funnel[:operation],
-                Event.property_query("a#{i}", funnel[:property]),
+                Event.property_query(funnel[:property]),
                 funnel[:order],
                 primitive: false
               )
             else
               funnel_relation = relation.operation(
-                "a#{i}",
                 funnel[:operation],
                 funnel[:group],
                 funnel[:order],
@@ -164,15 +171,15 @@ module Sibyl
     end
 
     def general_filters(as = nil, relation, funnel)
-      relation = relation.in_kind(as, funnel[:kind])
-      relation = relation.order_by(as, funnel[:order])
+      relation = relation.in_kind(funnel[:kind])
+      relation = relation.order_by(funnel[:order])
 
       funnel[:filters]&.each do |filter|
         filter = filter.last if filter.is_a? Array
 
-        relation = relation.filter_property?(as, filter[:property])
+        relation = relation.filter_property?(filter[:property])
         relation = relation.filter_property_value(
-          as, filter[:filter], filter[:property], filter[:value]
+          filter[:filter], filter[:property], filter[:value]
         )
 
         if params[:format] == "csv" && !funnel[:operation]
@@ -184,12 +191,12 @@ module Sibyl
       end
 
       # ignore dates in later stages of a funnel
-      unless as && (m = as.match(/\w(\d+)/)) && m[1].to_i > 0
-        relation = relation.date_from funnel[:from] unless funnel[:from].blank?
-        relation = relation.date_to funnel[:to] unless funnel[:to].blank?
-        relation = relation.date_previous funnel[:previous] unless funnel[:previous].blank?
-        relation = relation.date_previous_to funnel[:previous_to] unless funnel[:previous_to].blank?
-      end
+      # unless as && (m = as.match(/\w(\d+)/)) && m[1].to_i > 0
+      relation = relation.date_from funnel[:from] unless funnel[:from].blank?
+      relation = relation.date_to funnel[:to] unless funnel[:to].blank?
+      relation = relation.date_previous funnel[:previous] unless funnel[:previous].blank?
+      relation = relation.date_previous_to funnel[:previous_to] unless funnel[:previous_to].blank?
+      # end
 
       limit = safe_limit(funnel)
       relation = relation.limit(limit) unless limit.blank?
