@@ -122,7 +122,7 @@ module Sibyl
           # in PG `SELECT count(DISTINCT prop)` is a bit slower than
           # `SELECT count(*) FROM (SELECT DISTINCT prop)`
           unscoped.select("count(*)").from(
-            "(#{sc.select("DISTINCT #{property}").reorder('').to_sql}) sub"
+            sc.select(property).distinct.reorder("")
           )
         end
       when "group"
