@@ -222,8 +222,9 @@ module Sibyl
       sc = sc.reorder("") if @danger_order
       sc = yield(sc)
       if primitive
-        sc.inspect # this is needed to kick AR into action
-        if sc.size == 1
+        # sc.inspect # this is needed to kick AR into action
+        # the `to_a` below is needed to kick AR into action
+        if sc.to_a.size == 1
           sc[0][op]
         else
           # Hash is the time interval, AR::Relation is group by uniq
