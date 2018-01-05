@@ -23,7 +23,7 @@ $(function() {
     var id = $(this).closest(".panel").attr("id").slice(5) * 1;
     var funnel = panelParams[id].funnel;
 
-    $(".dropdown-toggle").dropdown('toggle');
+    $("#navbar-right .dropdown-toggle").dropdown('toggle');
     $("#editPanelButton").show().attr("onclick", "editPanelParams(" + id + "); return false;");
     Object.keys(funnel).forEach(function(panelKey, i) {
       var panel = funnel[panelKey];
