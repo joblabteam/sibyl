@@ -53,9 +53,10 @@ $(function() {
     setLocationParams();
   });
 
-  $(document).on("click", ".export-panel", function() {
+  $(document).on("click", ".export-panel-type", function() {
     var id = $(this).closest(".panel").attr("id").slice(5) * 1;
-    setExportParams(id);
+    var type = $(this).text();
+    setExportParams(id, type);
   });
 });
 
@@ -180,14 +181,14 @@ function appendPanelParams() {
 }
 
 // go to URL of panels query
-function setExportParams(id) {
+function setExportParams(id, type) {
   // var query = { panels: , title: $('[name="title"]').val() };
   // var zlib = btoa(pako.deflate(JSON.stringify(query), { to: 'string' }));
   // var encode = encodeURIComponent(zlib);
   // window.location = "?zlib=" + encode;
 
   var queryString = $.param(panelParams[id]);
-  window.location = eventsPath + ".csv?" + queryString;
+  window.location = eventsPath + "." + type + "?" + queryString;
 }
 
 function setLocationParams() {

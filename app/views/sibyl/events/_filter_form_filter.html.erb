@@ -16,7 +16,7 @@
       <label><small>Filter | Value ("string" / number)</small></label>
       <div class="input-group">
         <div class="input-group-btn">
-          <%= select_tag "funnel[][filters][][filter]", options_for_select({ "Equal to": "eq", "Not eql": "ne", "Greater": "gt", "Grtr or eql": "gte", "Less": "lt", "Less or eql": "lte", "Like": "like", "Not like": "not_like", "Blank": "blank", "Not blank": "not_blank", "Contains": "contains" }, params[:funnel]&.dig(0, :filters, i, :filter)), class: "form-control form-control-sm c-select" %>
+          <%= select_tag "funnel[][filters][][filter]", options_for_select({ "Equal to": "eq", "Not eql": "ne", "Greater": "gt", "Grtr or eql": "gte", "Less": "lt", "Less or eql": "lte", "Like": "like", "Not like": "not_like", "Blank": "blank", "Not blank": "not_blank", "Contains": "contains", "Contained in": "contained", "Has key": "one_key", "Any keys": "any_keys", "All keys": "all_keys" }, params[:funnel]&.dig(0, :filters, i, :filter)), class: "form-control form-control-sm c-select" %>
         </div>
         <input class="form-control form-control-sm" type="text" name="funnel[][filters][][value]" value="<%= params[:funnel]&.dig(0, :filters, i, :value) %>" placeholder='(Filter property value)'>
       </div>

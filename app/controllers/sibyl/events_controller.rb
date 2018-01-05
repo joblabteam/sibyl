@@ -121,9 +121,10 @@ module Sibyl
       end
 
       respond_to do |format|
-        format.html {}
+        format.csv { send_data to_csv(@events) }
         format.json { render json: @events }
-        format.csv { render text: to_csv(@events) }
+        format.xml { render xml: to_xml(@events) }
+        format.html {}
       end
     end
 

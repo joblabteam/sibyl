@@ -4,7 +4,14 @@
       <div class="card-title">
         <button type="button" class="btn btn-secondary btn-sm close-panel">x</button>
         <h5 class="inline-block" data-sb-panelx-output="title">---</h5>
-        <button type="button" class="btn btn-secondary btn-sm export-panel">csv</button>
+        <div class="btn-group export-panel">
+          <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
+          <ul class="dropdown-menu">
+            <button type="button" class="btn btn-secondary btn-sm export-panel-type">csv</button>
+            <button type="button" class="btn btn-secondary btn-sm export-panel-type">json</button>
+            <button type="button" class="btn btn-secondary btn-sm export-panel-type">xml</button>
+          </ul>
+        </div>
       </div>
       <h6 class="card-subtitle text-muted" data-sb-panelx-output="subtitle"></h6>
     </div>

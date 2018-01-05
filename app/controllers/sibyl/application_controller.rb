@@ -17,11 +17,23 @@ module Sibyl
         end
       elsif records.is_a?(Numeric)
         "#{(params[:funnel][0] || params[:funnel][:"0"])[:operation]}\n#{records}"
-      elsif records.is_a?(Numeric)
       else
         "#{records.first.as_json.keys.join(',')}\n#{records.map do |r|
           (r.is_a?(Hash) ? r : r.serializable_hash).values.join(',')
         end.join("\n")}"
+      end
+    end
+
+    def to_xml(records)
+      if records.is_a?(Hash)
+        records.to_xml
+      elsif records.is_a?(Numeric)
+        { (params[:funnel][0] || params[:funnel][:"0"])[:operation] => records }
+      else
+        records.to_xml
+        # "#{records.first.as_json.keys.join(',')}\n#{records.map do |r|
+        #   (r.is_a?(Hash) ? r : r.serializable_hash).values.join(',')
+        # end.join("\n")}"
       end
     end
   end
