@@ -85,6 +85,14 @@ module Sibyl
                   "(#{property})::text IS NOT NULL AND (#{property})::text != 'null' AND (#{property})::text != '\"\"'"
                 when "contains"
                   "#{property} @> '#{value}'::jsonb"
+                when "contained"
+                  "#{property} <@ '#{value}'::jsonb"
+                when "one_key"
+                  "#{property} ? '#{value}'"
+                when "any_keys"
+                  "#{property} ?| array[#{property_array(value).join(', ')}]"
+                when "all_keys"
+                  "#{property} ?& array[#{property_array(value).join(', ')}]"
                 end
 
         where(query)
