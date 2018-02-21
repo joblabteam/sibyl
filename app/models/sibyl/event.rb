@@ -31,7 +31,15 @@ module Sibyl
 
       triggers.each do |_trigger, actions|
         actions.each do |action|
-          SibylTriggerWorker.perform_async(action.to_s, kind, id)
+          if action.delayed?
+            SibylTriggerWorker.perform_in(
+              action.delay, action.call_class, kind, id
+            )
+          else
+            SibylTriggerWorker.perform_async(
+              action.call_class, kind, id
+            )
+          end
         end
       end
     end

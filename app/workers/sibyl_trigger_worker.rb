@@ -1,9 +1,9 @@
 class SibylTriggerWorker
   include Sidekiq::Worker
 
-  def perform(action_s, kind, event_id)
-    action = action_s.constantize
+  def perform(call_class, kind, event_id)
+    cls = call_class.constantize
     event = Sibyl::Event.find(event_id)
-    action.new(Sibyl::Event).call(kind, event)
+    cls.new.call(kind, event)
   end
 end

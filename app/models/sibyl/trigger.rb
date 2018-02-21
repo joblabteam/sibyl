@@ -1,6 +1,6 @@
 module Sibyl
-  class Trigger # < ActiveRecord::Base
-    def initialize(sibyl)
+  class Trigger
+    def initialize(sibyl = Sibyl::Event)
       @sibyl = sibyl
     end
 
@@ -9,9 +9,10 @@ module Sibyl
     end
 
     # Load the trigger class into the list of triggers
-    def self.triggers(*trigs)
+    def self.triggers(*trigs, **options)
       trigger_map(trigs).each do |trigger, action|
-        TRIGGERS[trigger] = Array(TRIGGERS[trigger]) << action
+        trigger_action = TriggerAction.new(action, **options)
+        TRIGGERS[trigger] = Array(TRIGGERS[trigger]) << trigger_action
       end
     end
 
