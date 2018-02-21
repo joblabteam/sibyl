@@ -1,4 +1,5 @@
 require "sibyl/engine"
+require "sibyl/trigger_action"
 require "csv"
 
 module Sibyl
