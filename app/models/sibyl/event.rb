@@ -31,17 +31,6 @@ module Sibyl
       self[:data].with_indifferent_access
     end
 
-    # Allows quicker indifferent access to nested JSON data.
-    # Often used in Triggers.
-    #
-    #   event.data[:foo][:bar][:baz]
-    #
-    #   # becomes:
-    #   event.dig(:foo, :bar, :baz)
-    def dig(*args)
-      data.with_indifferent_access.dig(*args)
-    end
-
     def queue_triggers
       triggers = TRIGGERS.select do |trigger, _actions|
         if trigger.is_a?(Regexp)
