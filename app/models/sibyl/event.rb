@@ -43,13 +43,11 @@ module Sibyl
       triggers.each do |_trigger, actions|
         actions.each do |action|
           if action.delayed?
-            SibylTriggerWorker.perform_in(
-              action.delay, action.call_class, kind, id
-            )
+            delay = action.delay
+            delay = delay.call(self) if delay.respond_to?(:call)
+            SibylTriggerWorker.perform_in(delay, action.call_class, kind, id)
           else
-            SibylTriggerWorker.perform_async(
-              action.call_class, kind, id
-            )
+            SibylTriggerWorker.perform_async(action.call_class, kind, id)
           end
         end
       end
@@ -62,13 +60,13 @@ module Sibyl
         properties = property_array(property)
 
         query = ""
-        properties.each_with_index do |property, i|
+        properties.each_with_index do |prop, i|
           # data?'foo' AND data->'foo'?'bar' AND data->'foo'->'bar'?'baz'
           query += " AND " unless i == 0
           query += "data"
           query += "->" unless properties[0...i].empty?
           query += properties[0...i].join("->")
-          query += "?#{property}"
+          query += "?#{prop}"
         end
 
         where(query)
