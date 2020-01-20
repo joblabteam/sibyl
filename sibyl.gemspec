@@ -7,8 +7,8 @@ require "sibyl/version"
 Gem::Specification.new do |s|
   s.name        = "sibyl"
   s.version     = Sibyl::VERSION
-  s.authors     = ["Simon George"]
-  s.email       = ["simon@sfcgeorge.co.uk"]
+  s.authors     = ["Simon George", "Miguel Montalvo"]
+  s.email       = ["simon@sfcgeorge.co.uk", "developer@joblab.com"]
   s.homepage    = ""
   s.summary     = "Sibyl is a central event log, trigger, and analysis tool."
   s.description = "Sibyl is a central event log, trigger, and analysis tool."
