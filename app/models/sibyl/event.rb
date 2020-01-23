@@ -5,7 +5,7 @@ module Sibyl
     # with the need to denormalize data (extracting objects ids to the Sibyl::Event
     # instance, we have this method including the ids we want to save.
     # example: { candidate_id: 1, vacancy_id: 23 }
-    def self.create_with_ids(kind, occurred_at = Time.now, data, ids)
+    def self.record(kind, occurred_at = Time.now, data, ids)
       new(
         kind: kind,
         occurred_at: occurred_at,
@@ -21,16 +21,6 @@ module Sibyl
         send(:"#{key}=", value) if respond_to?(:"#{key}=")
       end
       self
-    end
-
-    def self.record(kind, occurred_at = Time.now, data)
-      create!(
-        kind: kind,
-        occurred_at: occurred_at,
-        data: data
-      )
-    rescue ActiveRecord::RecordInvalid
-      false
     end
 
     # `record` is now the preferred name
