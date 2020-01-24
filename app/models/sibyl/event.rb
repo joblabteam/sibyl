@@ -5,7 +5,7 @@ module Sibyl
     # with the need to denormalize data (extracting objects ids to the Sibyl::Event
     # instance, we have this method including the ids we want to save.
     # example: { candidate_id: 1, vacancy_id: 23 }
-    def self.record(kind, occurred_at = Time.now, data, ids)
+    def self.record(kind, occurred_at = Time.now, data, **ids)
       new(
         kind: kind,
         occurred_at: occurred_at,
