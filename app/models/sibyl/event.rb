@@ -42,6 +42,10 @@ module Sibyl
       self[:data].with_indifferent_access
     end
 
+    def ids
+      self[:ids].with_indifferent_access
+    end
+
     def queue_triggers
       triggers = TRIGGERS.select do |trigger, _actions|
         if trigger.is_a?(Regexp)
