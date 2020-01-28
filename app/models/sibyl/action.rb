@@ -10,7 +10,7 @@ module Sibyl
     #                         preferably hash, e.g. page, UTM, etc.
     def self.record(kind, user:, with: nil, meta: {})
       user = user.id unless user.is_a?(Integer) || user.is_a?(String)
-      Event.record("sibyl-action_#{kind}", user: user, with: with, meta: meta)
+      Event.record(kind: "sibyl-action_#{kind}", data: { user: user, with: with, meta: meta })
     end
 
     # @param kind can be a string or array of strings
