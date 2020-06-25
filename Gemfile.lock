@@ -68,7 +68,7 @@ GEM
     nokogiri (1.8.0)
       mini_portile2 (~> 2.2.0)
     pg (0.21.0)
-    rack (2.0.3)
+    rack (2.2.3)
     rack-protection (2.0.0.rc2)
       rack
     rack-test (0.6.3)
